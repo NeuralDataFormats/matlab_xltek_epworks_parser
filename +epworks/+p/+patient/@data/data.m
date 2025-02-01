@@ -1,4 +1,4 @@
-classdef data
+classdef data  < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.eeg_waveform.data
@@ -38,9 +38,11 @@ classdef data
 
                     case 'Connections'
                         obj.connections = epworks.p.patient.data.connections(s2,r);
+                        r.logObject(obj.connections,index);
                     case 'DesignatedReviewerLabel'
                     case 'Info'
                         obj.info = epworks.p.patient.data.info(s2,r);
+                        r.logObject(obj.info,index);
                     case 'Insurance'
                     case 'IsNew'
                     case 'Schema'

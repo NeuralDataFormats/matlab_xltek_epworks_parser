@@ -1,4 +1,4 @@
-classdef data
+classdef data < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.eeg_waveform.data
@@ -6,10 +6,7 @@ classdef data
     properties
         s
 
-        % set_number
-        % group_obj_id
-        % is_active
-        % num_accepted
+        % TODO
     end
 
     methods

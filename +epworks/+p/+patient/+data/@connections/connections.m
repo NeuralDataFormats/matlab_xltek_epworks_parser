@@ -1,4 +1,4 @@
-classdef connections
+classdef connections  < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.patient.data.connections
@@ -34,8 +34,13 @@ classdef connections
 
                     case 'Client'
                         obj.client = epworks.p.patient.data.connections.client(s2,r);
+                        r.logObject(obj.client,index);
                     case 'Sink'
+                        obj.sink = epworks.p.patient.data.connections.sink(s2,r);
+                        r.logObject(obj.sink,index);
                     case 'Source'
+                        obj.source = epworks.p.patient.data.connections.source(s2,r);
+                        r.logObject(obj.source,index);
 
                     otherwise
                         keyboard

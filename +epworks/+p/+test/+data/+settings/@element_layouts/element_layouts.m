@@ -50,6 +50,7 @@ classdef element_layouts
                     %}
 
                     case 'Elements'
+                        obj.elements = epworks.p.test.data.settings.element_layouts.elements(s2,r);
                     case 'ID'
                     case 'Name'
 

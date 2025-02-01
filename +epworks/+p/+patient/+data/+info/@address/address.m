@@ -1,4 +1,4 @@
-classdef address
+classdef address < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.patient.data.info.address

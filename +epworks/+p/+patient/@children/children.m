@@ -1,4 +1,4 @@
-classdef children
+classdef children < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.test.children

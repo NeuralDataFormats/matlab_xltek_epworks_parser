@@ -1,4 +1,4 @@
-classdef data
+classdef data < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.eeg_waveform.data

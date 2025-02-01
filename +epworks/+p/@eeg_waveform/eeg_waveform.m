@@ -1,7 +1,11 @@
-classdef eeg_waveform
+classdef eeg_waveform < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.trace.active_waveform_obj_id
+
+    properties (Hidden)
+        id_props = {'parent'}
+    end
 
     properties
         s
@@ -28,11 +32,14 @@ classdef eeg_waveform
                 names{i} = s2.name;
                 switch s2.name
                     case 'Children'
-                        obj.children = epworks.p.eeg_waveform.children(s2,r);
+                        obj.children = epworks.p.children(s2,r);
+                        r.logObject(obj.children,index);
                     case 'Data'
                         obj.data = epworks.p.eeg_waveform.data(s2,r);
+                        r.logObject(obj.data,index);
                     case 'Id'
                         obj.id = s2.raw_data;
+                        r.logID(obj,obj.id);
                     case 'IsRoot'
                         obj.is_root = double(typecast(s2.raw_data,'uint32'));
                     case 'Parent'

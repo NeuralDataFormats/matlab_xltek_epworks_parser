@@ -93,6 +93,7 @@ classdef settings
                     case 'IsEMGTest'
 
                     case 'ManufacturingTest'
+                        obj.manufacturing_test = epworks.p.test.data.settings.manufacturing_test(s2,r);
 
                     case 'Name'
 
@@ -105,7 +106,7 @@ classdef settings
                     case 'TestTips'
 
                     case 'Timelines'
-
+                        obj.timelines = epworks.p.test.data.settings.timelines.initialize(s2,r);
                     case 'TrendSets'
 
                     otherwise

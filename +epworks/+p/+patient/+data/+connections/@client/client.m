@@ -1,7 +1,11 @@
-classdef client
+classdef client  < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.patient.data.connections.client
+
+    properties (Hidden)
+        id_props = {'process_id'}
+    end
 
     properties
         s
@@ -31,6 +35,7 @@ classdef client
                     %}
 
                     case 'ProcessId'
+                        obj.process_id = s2.raw_data;
                     otherwise
                         keyboard
                 end

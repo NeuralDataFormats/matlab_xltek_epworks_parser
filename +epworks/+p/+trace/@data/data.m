@@ -1,4 +1,4 @@
-classdef data
+classdef data < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.trace.data
@@ -6,6 +6,10 @@ classdef data
     %   See Also
     %   --------
     %   epworks.p.trace.children
+
+    properties (Hidden)
+        id_props = {'active_waveform_obj_id','test_obj_id','group_obj_id','o_chan_id'}
+    end
 
     properties
         s

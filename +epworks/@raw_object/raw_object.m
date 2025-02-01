@@ -164,9 +164,13 @@ classdef raw_object < handle
             
             roa = epworks.raw_object.recursiveGetAllObjects(roh,cur_obj_index,new_parent_indices);
             
+
+            %??? Why did I make everything static????
             epworks.raw_object.applyCharDataValues(roa,roh)
             epworks.raw_object.createFullNames(roa,true);
             epworks.raw_object.finalizeObjects(roa,roh)
+            
+            roa.finalize();
         end
         function roa = getTSTrawObjects(raw_data)
             %

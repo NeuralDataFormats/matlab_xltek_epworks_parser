@@ -1,7 +1,11 @@
-classdef data
+classdef data < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.eeg_waveform.data
+
+    properties (Hidden)
+        id_props = {'baseline_set_id','preview_set_id','raw_sweep_set_id','test_obj_id'}
+    end
 
     properties
         s
@@ -86,7 +90,6 @@ classdef data
                         keyboard
                 end
             end
-            
         end
     end
 end

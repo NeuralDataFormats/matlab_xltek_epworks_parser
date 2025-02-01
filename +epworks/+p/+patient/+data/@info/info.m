@@ -1,4 +1,4 @@
-classdef info
+classdef info  < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.patient.data.info
@@ -35,10 +35,16 @@ classdef info
 
                     case 'Address'
                         obj.address = epworks.p.patient.data.info.address(s2,r);
+                        r.logObject(obj.address,index);
                     case 'Admin'
+                        obj.admin = epworks.p.patient.data.info.admin(s2,r);
+                        r.logObject(obj.admin,index);
                     case 'Name'
+                        obj.name = epworks.p.patient.data.info.name(s2,r);
+                        r.logObject(obj.name,index);
                     case 'Personal'
-
+                        obj.personal = epworks.p.patient.data.info.personal(s2,r);
+                        r.logObject(obj.personal,index);
                     otherwise
                         keyboard
                 end

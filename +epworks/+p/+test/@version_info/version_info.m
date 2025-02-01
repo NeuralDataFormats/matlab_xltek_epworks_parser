@@ -1,4 +1,4 @@
-classdef version_info
+classdef version_info < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.test.version_info

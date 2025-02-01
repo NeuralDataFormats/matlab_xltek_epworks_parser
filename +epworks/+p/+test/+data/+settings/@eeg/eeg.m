@@ -49,6 +49,7 @@ classdef eeg
                     case 'AlphaMin'
                     case 'AppliedMontage'
                     case 'AppliedMontageKeyTree'
+                        obj.applied_montage_key_tree = epworks.p.test.data.settings.eeg.applied_montage_key_tree(s2,r);
                     case 'BetaMax'
                     case 'BetaMin'
                     case 'Delay'

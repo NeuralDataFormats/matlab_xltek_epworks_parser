@@ -18,6 +18,7 @@ function translateData(obj)
 %
 %   since in one case we have a number and in another a string ...
 
+%epworks.raw_object_array
 r = obj.raw_objects;
 
 s2 = struct;
@@ -34,6 +35,7 @@ objs = cell(1,r.n_objs);
 for i = 1:r.n_objs
     if ~r.processed(i)
         is_top(i) = true;
+        r.processed(i) = true;
         s = r.getStruct(i);
         switch s.full_name
             case 'EPTrace'
@@ -61,9 +63,13 @@ for i = 1:r.n_objs
             otherwise
                 keyboard
         end
+        r.logObject(objs{i},i)
     end
 end
 
+r.doObjectLinking();
+
+keyboard
 
 %Class: epworks.raw_object_array
 

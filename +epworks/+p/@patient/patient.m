@@ -1,7 +1,11 @@
-classdef patient
+classdef patient < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.patient
+
+    properties (Hidden)
+        id_props = {'parent'}
+    end
 
     properties
         s
@@ -33,11 +37,14 @@ classdef patient
                 s2 = r.getStruct(index);
                 switch s2.name
                     case 'Children'
-                        obj.children = epworks.p.patient.children(s2,r);
+                        obj.children = epworks.p.children(s2,r);
+                        r.logObject(obj.children,index);
                     case 'Data'
                         obj.data = epworks.p.patient.data(s2,r);
+                        r.logObject(obj.data,index);
                     case 'Id'
                         obj.id = s2.raw_data;
+                        r.logID(obj,obj.id);
                     case 'IsRoot'
                         obj.is_root = double(typecast(s2.raw_data,'uint32'));
                     case 'Parent'

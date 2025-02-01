@@ -13,6 +13,9 @@ classdef raw_object_array < handle
     %TODO: Update these definitions from epworks.raw_object class
     properties
         VERSION = 1
+
+        id_tracker
+
         parent_index %index of the parent, -1 indicates no parent
 
         depth
@@ -50,12 +53,18 @@ classdef raw_object_array < handle
         children_indices
         n_objs %The size of all the arrays above
         processed
+        logged_objects
+        n_logged_objects = 0
+
+        struct_array
     end
 
     methods
         function obj = raw_object_array()
 
             %??? Who calls this?
+
+            obj.id_tracker = epworks.parse.id_tracker(); 
 
             INIT_SIZE = 100000;
             obj.parent_index = -1*ones(1,INIT_SIZE);
@@ -92,10 +101,38 @@ classdef raw_object_array < handle
             obj.children_indices(c:end) = [];
             obj.n_objs = current_object_index;
             obj.processed = false(1,obj.n_objs);
+            obj.logged_objects = cell(1,obj.n_objs);
+        end
+        function finalize(obj)
+            t = obj.getTable();
+            s = table2struct(t);
+            obj.struct_array = s;
+        end
+        function doObjectLinking(obj)
+            %
+            %
+            %   Called by: epworks.iom_parser.translateData
+            
+            %Logging is simply to make it easier to iterate over
+            %the objects
+            for i = 1:length(obj.logged_objects)
+                cur_obj = obj.logged_objects{i};
+                if ~isempty(cur_obj)
+                    cur_obj.linkObjects(obj.id_tracker);
+                end
+            end
         end
         function s = getStruct(obj,index)
-            t = obj.getTable('index',index);
-            s = table2struct(t);
+            s = obj.struct_array(index);
+            % t = obj.getTable('index',index);
+            % s = table2struct(t);
+        end
+        function logObject(obj,obj_to_log,index)
+            obj.logged_objects{index} = obj_to_log;
+            obj.n_logged_objects = obj.n_logged_objects + 1;
+        end
+        function logID(obj,obj_to_log,id)
+            obj.id_tracker.logID(obj_to_log,id);
         end
         function [t,I] = getTable(obj,varargin)
 
