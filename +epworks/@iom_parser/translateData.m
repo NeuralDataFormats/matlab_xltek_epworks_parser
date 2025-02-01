@@ -19,6 +19,52 @@ function translateData(obj)
 %   since in one case we have a number and in another a string ...
 
 r = obj.raw_objects;
+
+s2 = struct;
+s2.trace = [];
+s2.eeg_waveform = [];
+s2.group = [];
+s2.set = [];
+s2.test = [];
+s2.study = [];
+s2.patient = [];
+
+is_top = false(1,r.n_objs);
+objs = cell(1,r.n_objs);
+for i = 1:r.n_objs
+    if ~r.processed(i)
+        is_top(i) = true;
+        s = r.getStruct(i);
+        switch s.full_name
+            case 'EPTrace'
+                objs{i} = epworks.p.trace(s,r);
+                s2.trace = [s2.trace objs{i}];
+            case 'EPEEGWaveform'
+                objs{i} = epworks.p.eeg_waveform(s,r);
+                s2.eeg_waveform = [s2.eeg_waveform objs{i}];
+            case 'EPGroup'
+                objs{i} = epworks.p.group(s,r);
+                s2.group = [s2.group objs{i}];
+            case 'EPSet'
+                objs{i} = epworks.p.set(s,r);
+                s2.set = [s2.set objs{i}];
+            case 'EPTest'
+                objs{i} = epworks.p.test(s,r);
+                s2.test = [s2.test objs{i}];
+            case 'EPStudy'
+                objs{i} = epworks.p.study(s,r);
+                s2.study = [s2.study objs{i}];
+            case 'EPPatient'
+                objs{i} = epworks.p.patient(s,r);
+                s2.patient = [s2.patient objs{i}];
+            %case ''
+            otherwise
+                keyboard
+        end
+    end
+end
+
+
 %Class: epworks.raw_object_array
 
 %                    d0: '----- Helper Info -----'
@@ -118,6 +164,10 @@ helper__type3(r,C,T,F)
 %--------------------------------------------------------------------------
 %                           Type 4
 %--------------------------------------------------------------------------
+w = epworks.parse.type4_parser(r);
+keyboard
+
+
 mask    = T.types == 4 & T.depths <= C.MAX_DEPTH;
 
 all_type_4_data = r.raw_data(mask)';
