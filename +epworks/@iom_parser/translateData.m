@@ -77,6 +77,7 @@ C.TYPE_1_TIMESTAMPS = {
     'EPTest.Data.CreationTime'
 };
 
+%Where did this come from?
 C.TYPE_3_LENGTHS = [2 8 16 172 176 2428 2430];
 
 C.TYPE_4_NAMES = {
@@ -88,6 +89,7 @@ C.TYPE_4_NAMES = {
     'UISettings'
 };
 
+%??? Where is this from?
 C.MAX_DEPTH = 6;
 
 %F - function handles 
@@ -169,9 +171,14 @@ end
 channels_mask = strcmp(T.names(mask),'Channels');
 
 channels_data = all_type_4_data(channels_mask);
-if any(~cellfun(@(x) isequal(x,uint8([0 0 0 0])),channels_data))
+mask = ~cellfun(@(x) isequal(x,uint8([0 0 0 0])),channels_data);
+if any(mask)
    error('channels data not empty, code needs to be adjusted') 
 end
+
+%What I'm seeing here is:
+
+
 
 half_montage_mask = strcmp(T.names(mask),'HalfMontageChannels');
 

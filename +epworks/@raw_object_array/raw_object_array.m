@@ -31,6 +31,8 @@ classdef raw_object_array < handle
        %  TODO: finish - see raw_object
        %  1 :
        %  2 : string
+       %  3
+       %  4 : complex object types?
        
        n_props
        data_start_I
@@ -44,7 +46,10 @@ classdef raw_object_array < handle
     end
     
     methods
-        function obj = raw_object_array
+        function obj = raw_object_array()
+
+            %??? Who calls this?
+
            INIT_SIZE = 100000;
            obj.parent_index = -1*ones(1,INIT_SIZE);
            obj.depth        = ones(1,INIT_SIZE);
@@ -79,6 +84,36 @@ classdef raw_object_array < handle
            obj.raw_data(c:end)     = [];
            obj.children_indices(c:end) = [];
            obj.n_objs = current_object_index;
+        end
+        function t = getTable(obj,varargin)
+            
+            in.type = [];
+            in = sl.in.processVarargin(in,varargin);
+
+            if ~isempty(in.type)
+                mask = in.type == obj.type;
+            else
+                mask = true(1,obj.n_objs);
+            end
+
+            depth = obj.depth(mask)';
+            n_bytes = obj.total_byte_length(mask)';
+            raw_start_I = obj.raw_start_I(mask)';
+            raw_stop_I = obj.raw_end_I(mask)';
+            name = obj.name(mask)';
+            full_name = obj.full_name(mask)';
+            type = obj.type(mask)';
+            n_props = obj.n_props(mask)';
+            data_start_I = obj.data_start_I(mask)';
+            data_length = obj.data_length(mask)';
+            data_value = obj.data_value(mask)';
+            raw_data = obj.raw_data(mask)';
+            child_indices = obj.children_indices(mask)';
+            t = table(depth,n_bytes,raw_start_I,raw_stop_I,name,full_name,...
+                type,n_props,data_start_I,data_length,...
+                data_value,raw_data,child_indices);
+
+
         end
     end
     
