@@ -13,6 +13,9 @@ classdef data < epworks.p.parse_object
         settings
         simulation_mode
         state
+        %0 - active
+        %1 - inactive
+        
         stimbox_connected
         test_set_obj_count
         version_info

@@ -10,8 +10,10 @@ classdef eeg_waveform < epworks.p.parse_object
     properties
         s
 
+        %I have not observed any children
         children
-        data
+
+        data epworks.p.eeg_waveform.data
         id
         is_root
         parent

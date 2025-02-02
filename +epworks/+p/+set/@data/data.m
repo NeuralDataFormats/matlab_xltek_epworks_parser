@@ -1,7 +1,17 @@
 classdef data < epworks.p.parse_object
     %
     %   Class:
-    %   epworks.p.eeg_waveform.data
+    %   epworks.p.set.data
+    %
+    %   See Also
+    %   --------
+    %   epworks.p.set
+    %   
+    %   
+
+    properties (Hidden)
+        id_props = {'group_obj_id'}
+    end
 
     properties
         s
@@ -34,13 +44,13 @@ classdef data < epworks.p.parse_object
 
 
                     case 'SetNumber'
-                        obj.set_number = double(typecast(s2.raw_data,'uint32'));
+                        obj.set_number = double(typecast(s2.raw_data,'int32'));
                     case 'GroupObjId'
                         obj.group_obj_id = s2.raw_data;
                     case 'IsActive'
-                        obj.is_active = double(typecast(s2.raw_data,'uint32'));
+                        obj.is_active = double(typecast(s2.raw_data,'int32'));
                     case 'NumAccepted'
-                        obj.num_accepted = double(typecast(s2.raw_data,'uint32'));
+                        obj.num_accepted = double(typecast(s2.raw_data,'int32'));
                     otherwise
                         keyboard
                 end

@@ -2,6 +2,8 @@ classdef parse_object < handle
     %
     %   Class:
     %   epworks.p.parse_object
+    %
+    %   This is the main class that parsed objects inherit from.
     
     % properties
     %     id_props
@@ -23,10 +25,15 @@ classdef parse_object < handle
                 for i = 1:length(id_props)
                     id_name = id_props{i};
                     id_value = obj.(id_name);
-                    linked_object = id_tracker.getObjectByID(id_value);
-                    obj.(id_name) = linked_object;
+                    if ~isempty(id_value)
+                        linked_object = id_tracker.getObjectByID(id_value);
+                        obj.(id_name) = linked_object;
+                    end
                 end
             end
+        end
+        function childrenToProps(obj)
+            %Null to override
         end
     end
 

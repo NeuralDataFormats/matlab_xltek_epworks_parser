@@ -1,4 +1,4 @@
-classdef settings
+classdef settings < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.test.settings

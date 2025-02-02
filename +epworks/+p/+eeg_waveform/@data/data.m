@@ -3,6 +3,10 @@ classdef data < epworks.p.parse_object
     %   Class:
     %   epworks.p.eeg_waveform.data
 
+    properties (Hidden)
+        id_props = {'set_obj','trace_obj'}
+    end
+
     properties
         s
 
@@ -18,10 +22,10 @@ classdef data < epworks.p.parse_object
         right_display_gain
         samp_freq
         sequence_number
-        set_obj_id
+        set_obj
         timebase
         timestamp
-        trace_obj_id
+        trace_obj
         trigger_delay
         visible
     end
@@ -57,7 +61,10 @@ classdef data < epworks.p.parse_object
                         %double looks good ...
                         obj.range = typecast(s2.raw_data,'double');
                     case 'Resolution'
-                        obj.resolution = double(typecast(s2.raw_data,'uint32'));
+                        obj.resolution = double(typecast(s2.raw_data,'int32'));
+                        if s2.type ~= 0
+                            keyboard
+                        end
                     case 'RightDisplayGain'
                         obj.resolution = double(typecast(s2.raw_data,'uint32'));
                     case 'SampFreq'
@@ -65,13 +72,13 @@ classdef data < epworks.p.parse_object
                     case 'SequenceNumber'
                         obj.sequence_number = double(typecast(s2.raw_data,'uint32'));
                     case 'SetObjId'
-                        obj.set_obj_id = s2.raw_data;
+                        obj.set_obj = s2.raw_data;
                     case 'Timebase'
                         obj.timebase = typecast(s2.raw_data,'double');
                     case 'Timestamp'
                         obj.timestamp = epworks.utils.processType3time(s2.raw_data);
                     case 'TraceObjId'
-                        obj.trace_obj_id = s2.raw_data;
+                        obj.trace_obj = s2.raw_data;
                     case 'TriggerDelay'
                         obj.trigger_delay = typecast(s2.raw_data,'double');
                     case 'Visible'

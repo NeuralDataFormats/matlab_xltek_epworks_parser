@@ -13,8 +13,6 @@ classdef data < epworks.p.parse_object
 
     properties
         s
-        objs
-        names
         %----------------
 
         name
@@ -51,7 +49,7 @@ classdef data < epworks.p.parse_object
                         obj.group_obj_id = s2.raw_data;
                         %objs{i} = epworks.p.trace.data.group_obj_id(s2,r);
                     case 'Name'
-                        obj.name = s2.data_value(1:end-1);
+                        obj.name = s2.data_value;
                     case 'OChanId'
                         obj.o_chan_id = s2.raw_data;
                     case 'OriginX'
@@ -72,24 +70,3 @@ classdef data < epworks.p.parse_object
         end
     end
 end
-
-
-%{
-            obj.s = s;
-            n_children = length(s.child_indices);
-            names = cell(1,n_children);
-            objs = cell(1,n_children);
-            for i = 1:n_children
-                index = s.child_indices(i);
-                r.processed(index) = true;
-                s2 = r.getStruct(index);
-                names{i} = s2.name;
-                switch s2.name
-                    case 'Children'
-                        objs{i} = epworks.p.trace.children(s2,r);
-                    otherwise
-                        keyboard
-                end
-            end
-
-%}

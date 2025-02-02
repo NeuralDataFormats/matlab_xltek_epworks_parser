@@ -2,6 +2,10 @@ classdef iom_parser < handle
     %
     %   Class:
     %   epworks.iom_parser
+    %
+    %   See Also
+    %   --------
+    %   epworks.main
     
     properties
        %Filter properties
@@ -9,7 +13,9 @@ classdef iom_parser < handle
     
     properties
         raw_u8_data  %The raw data as uint8
-        raw_objects     
+        raw_objects  epworks.raw_object_array   
+        s2
+        id_tracker
     end
     
     methods
@@ -24,15 +30,18 @@ classdef iom_parser < handle
             
             %This populates data_value for each raw objects (or most raw
             %objects)
+            %
+            %   Now populates s2, a struct
             obj.translateData();
+
+            obj.id_tracker = obj.raw_objects.id_tracker;
             
         end
         function unique_names = getUniqueNamesToHandle(obj)
             MAX_DEPTH = 6;
             
-            
             r = obj.raw_objects;
-            all_full_names = {r.full_name};
+            %all_full_names = {r.full_name};
             
             %Let's examine the truly unique name objects
             %that we care about ...

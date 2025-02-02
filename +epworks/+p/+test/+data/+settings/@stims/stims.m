@@ -1,4 +1,4 @@
-classdef stims
+classdef stims < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.test.data.settings.stims
@@ -108,6 +108,8 @@ classdef stims
                     case 'DeviceType'
                     case 'Divisions'
                     case 'ID'
+                        obj.id = s2.raw_data;
+                        r.logID(obj,obj.id);
                     case 'InitIntensity'
                     case 'InterPulseDuration'
                     case 'IpsiMode'

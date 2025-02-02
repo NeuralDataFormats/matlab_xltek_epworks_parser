@@ -2,6 +2,16 @@ classdef test < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.test
+    %
+    %   See Also
+    %   --------
+    %   epworks.p.study
+    %   epworks.p.group
+    %
+    %   Hierarchy
+    %   ---------
+    %   - study
+    %       - test
 
     properties (Hidden)
         id_props = {'parent'}
@@ -9,11 +19,12 @@ classdef test < epworks.p.parse_object
 
     properties
         s
-        names
-        objs
-        
+
         children
-        data
+
+        groups
+        
+        data %epworks.p.test.data
 
         id
 
@@ -59,8 +70,10 @@ classdef test < epworks.p.parse_object
                         keyboard
                 end
             end
-
-
+        end
+        function childrenToProps(obj)
+            mask = obj.children.class_names == "group";
+            obj.groups = [obj.children.objects{mask}];
         end
     end
 end

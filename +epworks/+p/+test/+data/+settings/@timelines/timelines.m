@@ -1,4 +1,4 @@
-classdef timelines
+classdef timelines < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.test.data.settings.timelines
@@ -55,6 +55,8 @@ classdef timelines
                     %}
 
                     case 'ID'
+                        obj.id = s2.raw_data;
+                        r.logID(obj,obj.id);
                     case 'IsEnabled'
                     case 'IsPaused'
                     case 'IsRunning'

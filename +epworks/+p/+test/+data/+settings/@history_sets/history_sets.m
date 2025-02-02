@@ -1,7 +1,11 @@
-classdef history_sets
+classdef history_sets < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.test.data.settings.history_sets
+
+    properties (Hidden)
+        id_props = {'history_trace_0','history_trace_1','history_trace_2','history_trace_3'}
+    end
 
     properties
         s
@@ -53,11 +57,17 @@ classdef history_sets
                     %}
 
                     case 'HistoryTrace0'
+                        obj.history_trace_0 = s2.raw_data;
                     case 'HistoryTrace1'
+                        obj.history_trace_1 = s2.raw_data;
                     case 'HistoryTrace2'
+                        obj.history_trace_2 = s2.raw_data;
                     case 'HistoryTrace3'
+                        obj.history_trace_3 = s2.raw_data;
                     case 'ID'
+                        obj.id = s2.raw_data;
                     case 'Name'
+                        obj.name = s2.data_value;
 
                     otherwise
                         keyboard

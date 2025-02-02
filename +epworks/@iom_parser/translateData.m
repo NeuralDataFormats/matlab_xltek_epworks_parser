@@ -68,30 +68,19 @@ for i = 1:r.n_objs
 end
 
 r.doObjectLinking();
+r.convertChildrenToProps();
+
+
+obj.s2 = s2;
+return
+
+%--------------------------------------------------
+%                   OLD CODE BELOW
+%--------------------------------------------------
+
 
 keyboard
 
-%Class: epworks.raw_object_array
-
-%                    d0: '----- Helper Info -----'
-%                 index: 1
-%          parent_index: -1
-%                 depth: 1
-%     total_byte_length: 3862
-%           raw_start_I: 41
-%             raw_end_I: 3903
-%                  name: 'TOP_LEVEL_OBJECT'
-%                  type: 5
-%               n_props: 1
-%              has_data: 1
-%          data_start_I: 46
-%           data_length: 3857
-%            data_value: []
-%              raw_data: []
-%                parsed: 1
-%             full_name: 'EPTriggeredWaveform'
-%              children: [1x7 epworks.raw_object]
-%      children_indices: [1349 1350 1351 1352 1353 1354 1355]
 
 %See the data object model for help with names:
 %CSV file in:
@@ -171,8 +160,6 @@ helper__type3(r,C,T,F)
 %                           Type 4
 %--------------------------------------------------------------------------
 w = epworks.parse.type4_parser(r);
-keyboard
-
 
 mask    = T.types == 4 & T.depths <= C.MAX_DEPTH;
 

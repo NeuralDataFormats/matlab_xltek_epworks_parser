@@ -1,9 +1,14 @@
-classdef file_manager < epworks.RNEL.handle_light
+classdef file_manager < handle
     %
     %   Class:
     %   epworks.file_manager
     %
     %   This class can be used to get all relevant file paths.
+    %
+    %   Structure
+    %   ---------
+    %   iom - config info
+    %   
     
     properties
         study_name

@@ -1,15 +1,23 @@
-classdef rec_file < epworks.id_object
+classdef rec_parser < epworks.id_object
     %
     %   Class:
-    %   epworks.history.rec_file
+    %   epworks.parse.rec_parser
     %
-    %   Contains results of parsed .REC files in the histroy folders
+    %   Contains results of parsed .REC files in the history folders
     %
     %   Format:
     %   - header
     %   - followed by waveforms
+    %   See Also
+    %   --------
+    %   epworks.p.main
+
     
-    
+    properties
+        bytes
+    end
+
+
     properties (Hidden)
         raw_ustr
         ID = uint64([0 0]) %This is a hack
@@ -23,10 +31,18 @@ classdef rec_file < epworks.id_object
         %for all .REC files I've seen;
         %
         %   value => [4679572887378700461 14937479848262515882]
+        %       0	168	193	100	191	46	241	64	0	64	62	163	199	150	76	207
         %
         %   I have yet to find an id that matches this version string.
         %   Even in other studies this seems to be the same.
+        
+        
+        %I think this means 2 IDS
         first_unknown   %A value of 2 has always been observed 
+
+
+
+
         file_timestamp  %matlab time converted to seconds
         file_timestamp_string %datestr of time
         trace_ID 
@@ -46,18 +62,19 @@ classdef rec_file < epworks.id_object
             }
     end
     methods
-        function obj = rec_file(file_path)
+        function obj = rec_parser(file_path)
             
             INTRO_BYTE_LENGTH = 96;
             
             F.typeMatrix = @epworks.sl.io.typecastMatrix;
-            F.toTime     = @epworks.sl.datetime.msBase1601ToMatlab;
             F.rowsToCell = @epworks.sl.array.rowsToCell;
             
             obj.file_path = file_path;
             
             r = epworks.sl.io.fileRead(file_path,'*uint8');
-            
+
+            obj.bytes = r;
+
             intro = r(1:96);
             
             %Process Intro
@@ -80,23 +97,31 @@ classdef rec_file < epworks.id_object
             %6) padded zeros
             %    - 65:96
                         
-            obj.first_ID       = typecast(intro(1:16),'uint64');
-            obj.first_unknown  = typecast(intro(17:20),'uint32');
+            obj.first_ID = r(1:16);
+            
+            %I think this is the # of IDs
+            obj.first_unknown = double(typecast(intro(17:20),'uint32'));
+            if obj.first_unknown ~= 2
+                error('Assuming only 2 values')
+            end 
             
             if obj.first_unknown ~= 2
                 %What happens when this is not 2?
                 error('Assumption violated')
             end
-            
-            obj.file_timestamp = F.toTime(typecast(intro(21:28),'uint64'));
-            obj.file_timestamp_string = datestr(obj.file_timestamp);
-            
-            other_IDs      = reshape(typecast(intro(29:60),'uint64'),2,2)';
+
+            %97 219 1 <= look for these bytes to help with finding
+            %            structure since they are unique
+            %            Note, this is like the year and maybe month
+            %            and day so change this for YOUR file
+            obj.file_timestamp = epworks.utils.processType3time(intro(21:28));
+                        
+            other_IDs = reshape(intro(29:60),16,2)';
             
             obj.trace_ID = other_IDs(1,:);
             obj.ochan_ID = other_IDs(2,:);
             
-            obj.default_length = typecast(intro(61:64),'uint32');
+            obj.default_length = double(typecast(intro(61:64),'uint32'));
             
             if ~all(intro(65:96) == 0)
                 error('Padded zeros assumption violated')
@@ -105,14 +130,48 @@ classdef rec_file < epworks.id_object
             %Data Processing
             %---------------------------------------------------------------
             
+            d2 = r(97:end);
+
+            %Find the same timestamps
+            I = strfind(d2,uint8([97 219 1]));
+            %26
+            %10514
+            %.... => 57 entries total
+
+            %10488 - default length
+
+
             %Let's assume for now everything is the default length ...
             bytes_remaining = length(r) - INTRO_BYTE_LENGTH;
             
             n_waveforms = bytes_remaining/obj.default_length;
             
             if n_waveforms ~= floor(n_waveforms)
+
+                %Note, if this is ever violated we can just rewrite the
+                %code to do one at a time and grow the results object
                 error('Constant length assumption violated')
             end
+
+            data_matrix = reshape(d2,obj.default_length,n_waveforms);
+
+            entries = cell(1,n_waveforms);
+            for i = 1:n_waveforms
+                entries{i} = epworks.p.rec.waveform(data_matrix(:,i));
+            end
+
+            obj.waveforms = [entries{:}];
+
+            keyboard
+
+            for i = 1:n_waveforms
+                plot(obj.waveforms(i).data)
+                title(sprintf('%d',i))
+                pause
+            end
+
+            %{
+            keyboard
             
             temp = reshape(r(97:end),obj.default_length,n_waveforms)';
             
@@ -130,14 +189,13 @@ classdef rec_file < epworks.id_object
             ids_cell = F.rowsToCell(F.typeMatrix(info(:,5:20),'uint64',false));
             [d.ID] = deal(ids_cell{:});
             
-            times_local = F.toTime(F.typeMatrix(info(:,21:28),'uint64',false));
-            
-            time_strings  = cellstr(datestr(times_local));
-            times_cell    = num2cell(times_local);
-            [d.timestamp] = deal(times_cell{:});
-            [d.timestamp_string] = deal(time_strings{:});
+            %TODO: remove these F calls
+            timestamp = F.typeMatrix(info(:,21:28),'uint64',false);
 
-            
+            times_local = epworks.utils.processType3time(timestamp);
+            times_cell = num2cell(times_local);
+            [d.timestamp] = deal(times_cell{:});
+
             word_0  = num2cell(F.typeMatrix(info(:,29:32),'uint32',false));
             word_1  = num2cell(F.typeMatrix(info(:,33:36),'uint32',false));
             word_2  = num2cell(F.typeMatrix(info(:,37:40),'uint32',false));
@@ -167,6 +225,7 @@ classdef rec_file < epworks.id_object
             rep_obj = repmat({obj},1,length(d));
             
             [d.m_parent] = deal(rep_obj{:});
+            %}
         end
     end
     

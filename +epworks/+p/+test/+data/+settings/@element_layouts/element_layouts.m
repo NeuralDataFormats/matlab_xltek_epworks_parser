@@ -1,4 +1,4 @@
-classdef element_layouts
+classdef element_layouts < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.test.data.settings.cursor_calc
@@ -52,6 +52,7 @@ classdef element_layouts
                     case 'Elements'
                         obj.elements = epworks.p.test.data.settings.element_layouts.elements(s2,r);
                     case 'ID'
+                        obj.id = s2.raw_data;
                     case 'Name'
 
                     otherwise

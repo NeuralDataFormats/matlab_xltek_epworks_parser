@@ -41,8 +41,6 @@ classdef personal  < epworks.p.parse_object
                     case 'HeightMetric'
                     case 'Weight'
                     case 'WeightMetric'
-
-
                     otherwise
                         keyboard
                 end

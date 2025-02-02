@@ -15,6 +15,8 @@ classdef children < epworks.p.parse_object
         n_children = 0
         ids
         objects
+        class_names
+        unique_class_names
     end
 
     methods
@@ -43,6 +45,8 @@ classdef children < epworks.p.parse_object
                 temp{i} = linked_object;
             end
             obj.objects = temp;
+            obj.class_names = cellfun(@epworks.utils.getShortClassName,temp,'UniformOutput',false)';
+            obj.unique_class_names = unique(obj.class_names);
         end
     end
 end

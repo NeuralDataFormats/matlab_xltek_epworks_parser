@@ -29,7 +29,9 @@ classdef raw_object_array < handle
         %%'a.b.c.d.f' instead of just 'f'
 
         type %
-        % -1 : no data
+        % -1 : no data?
+        %       - seen for age and birthdate for a file, which was accurate
+        %         
         %  0 : length 4, interpretation seems to vary
         %       - logical
         %       - single
@@ -42,6 +44,9 @@ classdef raw_object_array < handle
         %       - id, 16 bytes
         %       - times (type 3 format)
         %  4 : complex object types?
+        %  5 : objects
+        %       - things that hold more things
+        %  6 : GUIDs and HistoryTraces ....
 
         n_props
         data_start_I
@@ -121,6 +126,14 @@ classdef raw_object_array < handle
                     cur_obj.linkObjects(obj.id_tracker);
                 end
             end
+        end
+        function convertChildrenToProps(obj)
+            for i = 1:length(obj.logged_objects)
+                cur_obj = obj.logged_objects{i};
+                if ~isempty(cur_obj)
+                    cur_obj.childrenToProps();
+                end
+            end   
         end
         function s = getStruct(obj,index)
             s = obj.struct_array(index);

@@ -1,4 +1,4 @@
-classdef group_def
+classdef group_def < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.test.data.settings.group_def
@@ -75,9 +75,13 @@ classdef group_def
                     %}
 
                     case 'CaptureChime'
+                        obj.capture_chime = s2.raw_data;
                     case 'CaptureEnable'
+                        obj.capture_enable = s2.raw_data;
                     case 'CaptureThreshold'
+                        obj.capture_threshold = s2.raw_data;
                     case 'CollectMaxData'
+                        obj.collect_max_data = s2.raw_data;
                     case 'DesiredUpdateInterval'
                     case 'DiscreteReadings'
                     case 'DisplayMode'
@@ -85,11 +89,14 @@ classdef group_def
                     case 'FWaveFilter'
                     case 'ForcedDecimation'
                     case 'ID'
+                        obj.id = s2.raw_data;
+                        r.logID(obj,obj.id);
                     case 'IsEegGroup'
                     case 'LimitedHBDecimation'
                     case 'Location'
                     case 'MaacsGroupId'
                     case 'Name'
+                        obj.name = s2.data_value;
                     case 'NumDivisionsToCollect'
                     case 'PreTriggerDCOffset'
                     case 'PreTriggerTriggerDelay'
@@ -100,6 +107,7 @@ classdef group_def
                     case 'StartOnTestActivation'
                     case 'SweepsPerAvg'
                     case 'TimelineID'
+                        obj.timeline_id = s2.raw_data;
                     case 'TriggerDelay'
                     case 'TriggerSource'
 

@@ -1,4 +1,4 @@
-classdef cursor_def
+classdef cursor_def < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.test.data.settings.cursor_calc

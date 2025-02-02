@@ -22,7 +22,7 @@ r = parsed_iom_data.raw_objects;
 
 n_objects = r.n_objs;
 
-dom    = epworks.iom_data_model;
+dom = epworks.iom_data_model;
 
 %Property extraction from r to arrays
 %---------------------------------------------------------------

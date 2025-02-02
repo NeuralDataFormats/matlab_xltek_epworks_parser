@@ -2,6 +2,15 @@ classdef patient < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.patient
+    %
+    %   See Also
+    %   --------
+    %   epworks.p.
+    %
+    %
+    %   patient
+    %       - studies
+    %           - 
 
     properties (Hidden)
         id_props = {'parent'}
@@ -11,6 +20,9 @@ classdef patient < epworks.p.parse_object
         s
 
         children
+        studies
+
+        %------------------------------
         data
 
         id
@@ -57,6 +69,10 @@ classdef patient < epworks.p.parse_object
                         keyboard
                 end
             end
+        end
+        function childrenToProps(obj)
+            mask = obj.children.class_names == "study";
+            obj.studies = [obj.children.objects{mask}];
         end
     end
 end

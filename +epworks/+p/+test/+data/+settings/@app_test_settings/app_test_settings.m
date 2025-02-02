@@ -1,4 +1,4 @@
-classdef app_test_settings
+classdef app_test_settings < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.test.data.settings.app_test_settings
@@ -32,8 +32,9 @@ classdef app_test_settings
                     %}
 
                     case 'Build'
+                        obj.build = s2.raw_data;
                     case 'Version'
-
+                        obj.build = s2.raw_data;
                     otherwise
                         keyboard
                 end

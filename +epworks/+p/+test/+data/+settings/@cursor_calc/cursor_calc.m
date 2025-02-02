@@ -1,4 +1,4 @@
-classdef cursor_calc
+classdef cursor_calc < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.test.data.settings.cursor_calc
@@ -63,8 +63,11 @@ classdef cursor_calc
                     case 'DisplayType'
                     case 'FromDef'
                     case 'ID'
+                        obj.id = s2.raw_data;
+                        r.logID(obj,obj.id);
                     case 'IsMarker'
                     case 'Name'
+                        obj.name = s2.data_value;
                     case 'NegAlarmLevel'
                     case 'ToDef'
                     case 'ValueType'

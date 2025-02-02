@@ -1,7 +1,14 @@
 classdef raw_object < handle
     %
-    %
+    %   Class:
     %   epworks.raw_object
+    %
+    %
+    %   This parses the iom file. It works OK but was written
+    %   poorly and should be rewritten/cleaned up
+    %
+    %
+    %
     %
     %   This might generalize to the tst files as well ...
     %
@@ -9,6 +16,14 @@ classdef raw_object < handle
     %   -------------------------------------------------------------
     %   I might get a decent speedup on this by removing the handle
     %   usage ...
+    %
+    %   See Also
+    %   --------
+    %   epworks.raw_object_helper
+    %   epworks.raw_object.recursiveGetAllObjects
+    %   epworks.raw_object.applyCharDataValues
+    %   epworks.raw_object.createFullNames
+    %   epworks.raw_object.finalizeObjects
     
     properties
 %         %d0 = '----- Helper Info -----'
@@ -202,7 +217,8 @@ classdef raw_object < handle
             %in interpretation between true parent_indices and the start
             %value
             
-            roa = epworks.raw_object.recursiveGetAllObjects(roh,cur_obj_index,new_parent_indices);
+            roa = epworks.raw_object.recursiveGetAllObjects(...
+                roh,cur_obj_index,new_parent_indices);
 
             epworks.raw_object.applyCharDataValues(roa,roh)
             epworks.raw_object.createFullNames(roa,false);
@@ -231,7 +247,7 @@ classdef raw_object < handle
                 %Main processing call ...
                 epworks.raw_object.createRawObjects(roh,new_parent_indices);
                 
-                cur_obj_index    = roh.cur_obj_index;
+                cur_obj_index = roh.cur_obj_index;
                 roa = roh.raw_obj_array;
                 
                 %Analysis of new objects to see if we need to go deeper
@@ -508,6 +524,9 @@ classdef raw_object < handle
                 cur_start = char_starts(iChar);
                 cur_end   = char_ends(iChar);
                 char_values{iChar} = all_char_data(cur_start:cur_end);
+                if char_values{iChar} == "EEG Channel: F3 - T"
+                    keyboard
+                end
             end
             
             char_values(cellfun('isempty',char_values)) = {''};

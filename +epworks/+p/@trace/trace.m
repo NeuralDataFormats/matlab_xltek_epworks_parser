@@ -2,6 +2,10 @@ classdef trace < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.trace
+    %
+    %   See Also
+    %   --------
+    %   epworks.p.trace.data
 
     properties (Hidden)
         id_props = {'parent'}
@@ -10,7 +14,10 @@ classdef trace < epworks.p.parse_object
     properties
         s
         children
-        data
+
+        eeg_waveform
+
+        data epworks.p.trace.data
 
         id
 
@@ -24,6 +31,18 @@ classdef trace < epworks.p.parse_object
 
         %string
         type
+
+        name
+    end
+
+    methods 
+        function value = get.name(obj)
+            try
+                value = obj.data.name;
+            catch
+                value = '';
+            end
+        end
     end
 
     methods
@@ -58,7 +77,10 @@ classdef trace < epworks.p.parse_object
                         keyboard
                 end
             end
-
+        end
+    function childrenToProps(obj)
+            mask = obj.children.class_names == "eeg_waveform";
+            obj.eeg_waveform = [obj.children.objects{mask}];
         end
     end
 end

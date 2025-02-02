@@ -44,16 +44,14 @@ classdef main < epworks.RNEL.handle_light
             if nargin == 0
                 study_name_or_path = '';
             end
+
+            parsed_data = epworks.p.main(study_name_or_path);
             
-            file_manager    = epworks.file_manager(study_name_or_path);
             %Class: epworks.file_manager
+            file_manager = epworks.file_manager(study_name_or_path);
             
-            parsed_iom_data = epworks.iom_parser(file_manager.iom_file_path);
             %Class: epworks.iom_parser
-            %
-            %NOTE: This data could be interesting as it shows the raw data
-            %in the file before we drop objects. This class is not held onto
-            %for the final output.
+            parsed_iom_data = epworks.iom_parser(file_manager.iom_file_path);
             
             obj.populateIOMObjects(parsed_iom_data);
             
@@ -63,9 +61,9 @@ classdef main < epworks.RNEL.handle_light
             
             %rec files
             %---------------------------------------------------------------
-            all_rec_files  = [file_manager.rec_file_paths{:}];
+            all_rec_files = [file_manager.rec_file_paths{:}];
             
-            n_rec_files    = length(all_rec_files);
+            n_rec_files = length(all_rec_files);
             
             rec_files_cell = cell(1,n_rec_files);
             

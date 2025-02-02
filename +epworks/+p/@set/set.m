@@ -11,6 +11,7 @@ classdef set < epworks.p.parse_object
         s
         
         children
+        n_children
         data
 
         id
@@ -38,6 +39,7 @@ classdef set < epworks.p.parse_object
                 switch s2.name
                     case 'Children'
                         obj.children = epworks.p.children(s2,r);
+                        obj.n_children = obj.children.n_children;
                         r.logObject(obj.children,index);
                     case 'Data'
                         obj.data = epworks.p.set.data(s2,r);

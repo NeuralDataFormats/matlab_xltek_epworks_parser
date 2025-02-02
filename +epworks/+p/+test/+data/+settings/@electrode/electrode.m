@@ -1,4 +1,4 @@
-classdef electrode
+classdef electrode < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.test.data.settings.electrode
@@ -52,7 +52,12 @@ classdef electrode
                     %}
 
                     case 'EEGSiteGUID'
+                        obj.eeg_site_guid = s2.raw_data;
+                        %Is this the owner?
+                        %r.logID(obj,obj.eeg_site_guid);
                     case 'ID'
+                        obj.id = s2.raw_data;
+                        r.logID(obj,obj.id);
                     case 'Location'
                     case 'PhysElectrode'
                     case 'PhysName'

@@ -1,4 +1,4 @@
-classdef i_chans
+classdef i_chans < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.test.data.settings.cursor_calc
@@ -66,6 +66,8 @@ classdef i_chans
                     case 'EventThreshold'
                     case 'HardwareLFF'
                     case 'ID'
+                        obj.id = s2.raw_data;
+
                     case 'IsSquelch'
                     case 'LogicalChan'
                     case 'MontageChanId'

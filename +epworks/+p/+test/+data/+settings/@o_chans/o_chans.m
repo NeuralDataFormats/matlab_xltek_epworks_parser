@@ -1,4 +1,4 @@
-classdef o_chans
+classdef o_chans < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.test.data.settings.cursor_calc
@@ -73,6 +73,8 @@ classdef o_chans
                     case 'GroupDef'
                     case 'HffCutoff'
                     case 'ID'
+                        obj.id = s2.raw_data;
+                        r.logID(obj,obj.id);
                     case 'IsChannelEnabled'
                     case 'IsChannelTrigger'
                     case 'IsRejectionOnStimSaturation'
@@ -81,6 +83,7 @@ classdef o_chans
                     case 'MaacsTraceId'
                     case 'MaxUserVariation'
                     case 'Name'
+                        obj.name = s2.data_value;
                     case 'NotchCutoff'
                     case 'PreviewMode'
                     case 'PreviewSettings'

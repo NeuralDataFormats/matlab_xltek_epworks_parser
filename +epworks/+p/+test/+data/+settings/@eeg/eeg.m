@@ -1,4 +1,4 @@
-classdef eeg
+classdef eeg < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.test.data.settings.eeg

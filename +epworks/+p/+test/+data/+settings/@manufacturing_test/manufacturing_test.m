@@ -1,4 +1,4 @@
-classdef manufacturing_test
+classdef manufacturing_test < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.test.data.settings.manufacturing_test

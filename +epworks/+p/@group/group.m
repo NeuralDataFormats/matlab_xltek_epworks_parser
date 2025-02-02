@@ -2,6 +2,23 @@ classdef group < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.group
+    %
+    %   See Also
+    %   --------
+    %   epworks.p.study
+    %   epworks.p.test
+    %   epworks.p.group
+    %   epworks.p.set
+    %   epworks.p.traces
+    %   
+    %
+    %   Hierarchy
+    %   ---------
+    %   - study
+    %       - test
+    %           - group
+    %               - sets
+    %               - traces
 
     properties (Hidden)
         id_props = {'parent'}
@@ -9,10 +26,13 @@ classdef group < epworks.p.parse_object
 
     properties
         s
-        names
-        objs
         
         children
+        n_children
+
+        sets
+        traces
+
         data
 
         id
@@ -40,6 +60,7 @@ classdef group < epworks.p.parse_object
                 switch s2.name
                     case 'Children'
                         obj.children = epworks.p.children(s2,r);
+                        obj.n_children = obj.children.n_children;
                         r.logObject(obj.children,index);
                     case 'Data'
                         obj.data = epworks.p.group.data(s2,r);
@@ -59,8 +80,13 @@ classdef group < epworks.p.parse_object
                         keyboard
                 end
             end
+        end
+        function childrenToProps(obj)
+            mask = obj.children.class_names == "set";
+            obj.sets = [obj.children.objects{mask}];
 
-
+            mask = obj.children.class_names == "trace";
+            obj.traces = [obj.children.objects{mask}];
         end
     end
 end
