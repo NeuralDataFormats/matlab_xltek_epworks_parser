@@ -38,8 +38,13 @@ classdef waveform < handle
             %   - is this because there are just 0s for some amount
             %   of data?
 
+            n_values_read = double(typecast(data(1:4),'int32'));
+            if n_values_read ~= default_length
+                error('Assumption violated')
+            end
+            obj.id = data(5:20);
             obj.timestamp = epworks.utils.processType3time(data(21:28));
-            obj.data = typecast(data(889:end),'single');
+            obj.data = typecast(data(89:end),'single');
         end
     end
 end

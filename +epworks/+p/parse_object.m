@@ -5,9 +5,9 @@ classdef parse_object < handle
     %
     %   This is the main class that parsed objects inherit from.
     
-    % properties
-    %     id_props
-    % end
+    properties
+        
+    end
 
     %{
          < epworks.p.parse_object
@@ -19,6 +19,9 @@ classdef parse_object < handle
     %}
 
     methods
+        function logUnhandled(obj,name,value,r)
+            %What do we want to do here?
+        end
         function linkObjects(obj,id_tracker)
             if isprop(obj,'id_props')
                 id_props = obj.id_props; %#ok<MCNPN>
@@ -38,3 +41,21 @@ classdef parse_object < handle
     end
 
 end
+
+%   r.logObject(obj.client,index);
+%   r.logID(obj,obj.id);
+%{
+    properties (Hidden)
+        id_props = {'baseline_set_id','preview_set_id','raw_sweep_set_id','test_obj_id'}
+    end
+
+
+    properties (Hidden)
+        id_props = {'parent'}
+    end
+
+                        obj.id = s2.raw_data;
+                        r.logID(obj,obj.id);
+
+
+%}

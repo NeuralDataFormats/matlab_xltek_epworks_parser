@@ -45,7 +45,11 @@ classdef main < epworks.RNEL.handle_light
                 study_name_or_path = '';
             end
 
-            parsed_data = epworks.p.main(study_name_or_path);
+            parsed_data = epworks.parse.main(study_name_or_path);
+
+
+            %Old code at this point ...
+            %--------------------------------------------------------------
             
             %Class: epworks.file_manager
             file_manager = epworks.file_manager(study_name_or_path);
