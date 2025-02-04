@@ -39,6 +39,7 @@ classdef patient < epworks.p.parse_object
 
     methods
         function obj = patient(s,r)
+            r.logObject(obj);
             p = s.props;
             fn = fieldnames(p);
             for i = 1:length(fn)
@@ -66,8 +67,10 @@ classdef patient < epworks.p.parse_object
             end
         end
         function childrenToProps(obj)
-            mask = obj.children.class_names == "study";
-            obj.studies = [obj.children.objects{mask}];
+            class_names = cellfun(@epworks.utils.getShortClassName,obj.children,'un',0);
+
+            mask = class_names == "study";
+            obj.studies = [obj.children{mask}];
         end
     end
 end

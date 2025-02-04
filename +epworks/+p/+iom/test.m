@@ -42,6 +42,7 @@ classdef test < epworks.p.parse_object
 
     methods
         function obj = test(s,r)
+            r.logObject(obj);
             p = s.props;
             fn = fieldnames(p);
             for i = 1:length(fn)
@@ -69,8 +70,10 @@ classdef test < epworks.p.parse_object
             end
         end
         function childrenToProps(obj)
-            mask = obj.children.class_names == "group";
-            obj.groups = [obj.children.objects{mask}];
+            class_names = cellfun(@epworks.utils.getShortClassName,obj.children,'un',0);
+
+            mask = class_names == "group";
+            obj.groups = [obj.children{mask}];
         end
     end
 end

@@ -4,7 +4,6 @@ classdef settings < epworks.p.parse_object
     %   epworks.p.test.settings
 
     properties
-        s
         active_layout
         app_test_settings
         board_revision
@@ -35,23 +34,13 @@ classdef settings < epworks.p.parse_object
 
     methods
         function obj = settings(s,r)
+            r.logObject(obj);
             p = s.props;
             fn = fieldnames(p);
             for i = 1:length(fn)
                 cur_name = fn{i};
                 value = p.(cur_name);
                 switch cur_name
-                    %{
-                    case 'AudioVolume'
-                        obj.audio_volume = double(typecast(s2.raw_data,'uint32'));
-                    case 'Color'
-                        obj.color = double(s2.raw_data);
-                    case 'HffCutoff'
-                        obj.hff_cutoff = typecast(s2.raw_data,'double');
-                    case 'IsAlarmedWave'
-                        obj.is_alarmed_wave = double(typecast(s2.raw_data,'uint32'));
-                    %}
-
                     case 'ActiveLayout'
                         obj.active_layout = value;
                     case 'AppTestSettings'

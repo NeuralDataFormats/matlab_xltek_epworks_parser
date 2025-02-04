@@ -1,4 +1,4 @@
-classdef channel < handle
+classdef channel < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.iom.test.data.settings.eeg.applied_montage_key_tree.channel
@@ -49,6 +49,7 @@ classdef channel < handle
     end
     methods
     function obj = channel(s,r)
+            r.logObject(obj);
             p = s.props;
             %Note, the object is chan_index and then the channel
             %itself. Rather than nesting we just grab the index then 

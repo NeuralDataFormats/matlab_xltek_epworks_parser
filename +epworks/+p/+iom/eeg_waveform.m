@@ -19,6 +19,7 @@ classdef eeg_waveform < epworks.p.parse_object
 
     methods
         function obj = eeg_waveform(s,r)
+            r.logObject(obj);
             p = s.props;
             fn = fieldnames(p);
             for i = 1:length(fn)

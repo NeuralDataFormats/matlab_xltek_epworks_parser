@@ -1,4 +1,4 @@
-classdef half_montage_channel < handle
+classdef half_montage_channel < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.iom.test.data.settings.eeg.applied_montage_key_tree.half_montage_channel
@@ -30,6 +30,7 @@ classdef half_montage_channel < handle
     end
     methods
     function obj = half_montage_channel(s,r)
+            r.logObject(obj);
             p = s.props;
             fn = fieldnames(p);
             for i = 1:length(fn)

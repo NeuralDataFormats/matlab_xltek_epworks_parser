@@ -8,19 +8,16 @@ classdef data < epworks.p.parse_object
     %   epworks.p.trace.children
 
     properties (Hidden)
-        id_props = {'active_waveform_obj_id','test_obj_id','group_obj_id','o_chan_id'}
+        id_props = {'active_waveform_obj','test_obj','group_obj','o_chan'}
     end
 
     properties
-        s
-        %----------------
-
         name
         create_time
-        active_waveform_obj_id
-        test_obj_id
-        group_obj_id
-        o_chan_id
+        active_waveform_obj
+        test_obj
+        group_obj
+        o_chan
         origin_x
         origin_y
         last_recorded_set_number
@@ -31,7 +28,7 @@ classdef data < epworks.p.parse_object
 
     methods
         function obj = data(s,r)
-
+            r.logObject(obj);
             p = s.props;
             fn = fieldnames(p);
 
@@ -40,15 +37,15 @@ classdef data < epworks.p.parse_object
                 value = p.(cur_name);
                 switch cur_name
                     case 'ActiveWaveformObjId'
-                        obj.active_waveform_obj_id = value;
+                        obj.active_waveform_obj = value;
                     case 'CreateTime'
                         obj.create_time = epworks.utils.processType3time(value);
                     case 'GroupObjId'
-                        obj.group_obj_id = value;
+                        obj.group_obj = value;
                     case 'Name'
                         obj.name = value;
                     case 'OChanId'
-                        obj.o_chan_id = value;
+                        obj.o_chan = value;
                     case 'OriginX'
                         %u32?
                         obj.origin_x = value;
@@ -57,7 +54,7 @@ classdef data < epworks.p.parse_object
                     case 'State'
                         obj.state = value;
                     case 'TestObjId'
-                        obj.test_obj_id = value;
+                        obj.test_obj = value;
                     case 'LastRecordedSetNumber'
                         obj.last_recorded_set_number = value;
                     otherwise

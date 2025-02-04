@@ -13,7 +13,7 @@ classdef logger < handle
     properties
         first_past_object_count = 0
         logging_index = 0
-        all_objects
+        logged_objects
 
         id_tracker epworks.parse.id_tracker
 
@@ -36,14 +36,15 @@ classdef logger < handle
             obj.id_tracker = epworks.parse.id_tracker;
         end
         function initializeObjectHolder(obj)
-            obj.all_objects = cell(1,obj.first_past_object_count);
+            obj.logged_objects = cell(1,obj.first_past_object_count);
         end
         function logEntry(obj)
             obj.first_past_object_count = obj.first_past_object_count + 1;
             %fprintf('Object: %d\n',obj.I)
         end
         function logObject(obj,obj_to_log)
-
+            obj.logging_index = obj.logging_index + 1;
+            obj.logged_objects{obj.logging_index} = obj_to_log;
         end
         function logID(obj,obj_to_log,id)
             obj.id_tracker.logID(obj_to_log,id);
@@ -59,6 +60,17 @@ classdef logger < handle
                 cur_obj = obj.logged_objects{i};
                 if ~isempty(cur_obj)
                     cur_obj.linkObjects(obj.id_tracker);
+                end
+            end
+        end
+        function out = getObjectByID(obj,id)
+            out = obj.id_tracker.getObjectByID(id);
+        end
+        function convertChildrenToProps(obj)
+            for i = 1:length(obj.logged_objects)
+                cur_obj = obj.logged_objects{i};
+                if ~isempty(cur_obj)
+                    cur_obj.childrenToProps();
                 end
             end
         end

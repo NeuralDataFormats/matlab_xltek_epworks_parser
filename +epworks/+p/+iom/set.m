@@ -30,6 +30,7 @@ classdef set < epworks.p.parse_object
 
     methods
         function obj = set(s,r)
+            r.logObject(obj);
             p = s.props;
             fn = fieldnames(p);
             for i = 1:length(fn)

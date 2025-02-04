@@ -5,7 +5,7 @@ classdef iom_parser < handle
     %
     %   See Also
     %   --------
-    %   epworks.p.main
+    %   epworks.parse.main
     %   epworks.parse.raw_object
 
     properties
@@ -17,6 +17,7 @@ classdef iom_parser < handle
         top_objects
         s
         s2
+        logger
     end
 
     methods
@@ -44,6 +45,7 @@ classdef iom_parser < handle
             %
             %   This helps us to track object creation
             r = epworks.parse.iom.logger;
+            obj.logger = r;
             
             object_I = 0;
             top_objects = cell(1,1000);
@@ -78,6 +80,8 @@ classdef iom_parser < handle
                s_all{i} = s;
             end
             obj.s = [s_all{:}];
+
+            r.initializeObjectHolder();
 
 
             %A little bit of organizing into specific top level types
@@ -122,7 +126,6 @@ classdef iom_parser < handle
             %not logging the objs
             obj.s2 = s2;
 
-            keyboard
             r.doObjectLinking();
             r.convertChildrenToProps();
 

@@ -26,8 +26,10 @@ classdef raw_object
 
             depth = depth + 1;
             obj.depth = depth;
+
             %We may want to do more here
             r.logEntry();
+            
             %fprintf('Processing obj: %d:%d\n',I1,depth)
 
             obj.n_bytes_to_next = double(typecast(bytes(I1+1:I1+4),'uint32'));

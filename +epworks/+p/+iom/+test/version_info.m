@@ -10,6 +10,7 @@ classdef version_info < epworks.p.parse_object
 
     methods
         function obj = version_info(s,r)
+            r.logObject(obj);
             obj.raw_data = s;
         end
     end

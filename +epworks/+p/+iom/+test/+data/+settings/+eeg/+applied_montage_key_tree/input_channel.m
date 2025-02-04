@@ -1,4 +1,4 @@
-classdef input_channel < handle
+classdef input_channel < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.iom.test.data.settings.eeg.applied_montage_key_tree.input_channel
@@ -33,6 +33,7 @@ classdef input_channel < handle
     end
     methods
     function obj = input_channel(s,r)
+            r.logObject(obj);
             p = s.props;
             fn = fieldnames(p);
             for i = 1:length(fn)

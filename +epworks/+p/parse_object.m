@@ -34,6 +34,16 @@ classdef parse_object < handle
                     end
                 end
             end
+            if isprop(obj,'children')
+                n_children = length(obj.children); %#ok<MCNPN>
+                child_objects = cell(1,n_children);
+                for i = 1:n_children
+                    id_value = obj.children{i}; %#ok<MCNPN>
+                    linked_object = id_tracker.getObjectByID(id_value);
+                    child_objects{i} = linked_object;
+                end
+                obj.children = child_objects; %#ok<MCNPN>
+            end
         end
         function childrenToProps(obj)
             %Null to override

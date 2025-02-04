@@ -21,8 +21,6 @@ classdef study < epworks.p.parse_object
     end
 
     properties
-        s
-
         children
         tests
 
@@ -44,6 +42,7 @@ classdef study < epworks.p.parse_object
 
     methods
         function obj = study(s,r)
+            r.logObject(obj);
             p = s.props;
             fn = fieldnames(p);
             for i = 1:length(fn)
@@ -56,7 +55,7 @@ classdef study < epworks.p.parse_object
                         obj.data = epworks.p.iom.study.data(value,r);
                     case 'Id'
                         obj.id = value;
-                        r.logID(obj,obj.id);
+                        r.logID(obj,value);
                     case 'IsRoot'
                         obj.is_root = value;
                     case 'Parent'
@@ -71,8 +70,10 @@ classdef study < epworks.p.parse_object
             end
         end
         function childrenToProps(obj)
-            mask = obj.children.class_names == "test";
-            obj.tests = [obj.children.objects{mask}];
+            class_names = cellfun(@epworks.utils.getShortClassName,obj.children,'un',0);
+
+            mask = class_names == "test";
+            obj.tests = [obj.children{mask}];
         end
     end
 end

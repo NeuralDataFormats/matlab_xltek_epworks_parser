@@ -25,8 +25,6 @@ classdef group < epworks.p.parse_object
     end
 
     properties
-        s
-        
         children
         n_children
 
@@ -51,6 +49,7 @@ classdef group < epworks.p.parse_object
 
     methods
         function obj = group(s,r)
+            r.logObject(obj);
             p = s.props;
             fn = fieldnames(p);
             for i = 1:length(fn)
@@ -78,11 +77,13 @@ classdef group < epworks.p.parse_object
             end
         end
         function childrenToProps(obj)
-            mask = obj.children.class_names == "set";
-            obj.sets = [obj.children.objects{mask}];
+            class_names = cellfun(@epworks.utils.getShortClassName,obj.children,'un',0);
 
-            mask = obj.children.class_names == "trace";
-            obj.traces = [obj.children.objects{mask}];
+            mask = class_names == "set";
+            obj.sets = [obj.children{mask}];
+
+            mask = class_names == "trace";
+            obj.traces = [obj.children{mask}];
         end
     end
 end
