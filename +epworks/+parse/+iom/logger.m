@@ -48,5 +48,19 @@ classdef logger < handle
         function logID(obj,obj_to_log,id)
             obj.id_tracker.logID(obj_to_log,id);
         end
+        function doObjectLinking(obj)
+            %
+            %
+            %   Called by: epworks.iom_parser.translateData
+            
+            %Logging is simply to make it easier to iterate over
+            %the objects
+            for i = 1:length(obj.logged_objects)
+                cur_obj = obj.logged_objects{i};
+                if ~isempty(cur_obj)
+                    cur_obj.linkObjects(obj.id_tracker);
+                end
+            end
+        end
     end
 end

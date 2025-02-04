@@ -44,7 +44,17 @@ classdef waveform < handle
             end
             obj.id = data(5:20);
             obj.timestamp = epworks.utils.processType3time(data(21:28));
-            obj.data = typecast(data(89:end),'single');
+
+            %892 - first non-zero sample
+            obj.data = double(typecast(data(89:end),'single'));
+            %obj.data = data(89:end);
+
+            %{
+                d1 = data(121:end);
+                d2 = data(889:end);
+                    %10 - yes
+
+            %}
         end
     end
 end

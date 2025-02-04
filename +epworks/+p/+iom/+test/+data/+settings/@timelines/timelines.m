@@ -20,13 +20,12 @@ classdef timelines < epworks.p.parse_object
             %
             %   objs = epworks.p.test.data.settings.timelines.initialize(s,r)
 
-            n_children = length(s.child_indices);
+            a = s.array;
+            n_children = length(a);
             objs = cell(1,n_children);
             for i = 1:n_children
-                index = s.child_indices(i);
-                r.processed(index) = true;
-                s2 = r.getStruct(index);
-                obj = epworks.p.test.data.settings.timelines(s2,r);
+                s2 = a{i};
+                obj = epworks.p.iom.test.data.settings.timelines(s2,r);
                 objs{i} = obj;
             end
             objs = [objs{:}];
@@ -35,14 +34,12 @@ classdef timelines < epworks.p.parse_object
 
     methods
         function obj = timelines(s,r)
-            obj.s = s;
-            n_children = length(s.child_indices);
-            for i = 1:n_children
-                index = s.child_indices(i);
-                r.processed(index) = true;
-                s2 = r.getStruct(index);
-
-                switch s2.name
+            p = s.props;
+            fn = fieldnames(p);
+            for i = 1:length(fn)
+                cur_name = fn{i};
+                value = p.(cur_name);
+                switch cur_name
                     %{
                     case 'AudioVolume'
                         obj.audio_volume = double(typecast(s2.raw_data,'uint32'));
@@ -55,16 +52,22 @@ classdef timelines < epworks.p.parse_object
                     %}
 
                     case 'ID'
-                        obj.id = s2.raw_data;
+                        obj.id = value;
                         r.logID(obj,obj.id);
                     case 'IsEnabled'
+                        obj.is_enabled = value;
                     case 'IsPaused'
+                        obj.is_paused = value;
                     case 'IsRunning'
+                        obj.is_running = value;
                     case 'IsWaiting'
+                        obj.is_waiting = value;
                     case 'RestartDelay'
+                        obj.restart_delay = value;
                     case 'StartWaiting'
+                        obj.start_waiting = value;
                     case 'Type'
-
+                        obj.type = value;
                     otherwise
                         keyboard
                 end

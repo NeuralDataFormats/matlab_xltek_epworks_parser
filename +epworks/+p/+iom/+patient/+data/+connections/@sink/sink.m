@@ -4,32 +4,20 @@ classdef sink < epworks.p.parse_object
     %   epworks.p.patient.data.connections.sink
 
     properties
-        s
-
         host
     end
 
     methods
         function obj = sink(s,r)
-            obj.s = s;
-            n_children = length(s.child_indices);
-            for i = 1:n_children
-                index = s.child_indices(i);
-                r.processed(index) = true;
-                s2 = r.getStruct(index);
+            p = s.props;
+            fn = fieldnames(p);
+            for i = 1:length(fn)
+                cur_name = fn{i};
+                value = p.(cur_name);
+                switch cur_name
 
-                switch s2.name
-                    %{
-                    case 'AudioVolume'
-                        obj.audio_volume = double(typecast(s2.raw_data,'uint32'));
-                    case 'Color'
-                        obj.color = double(s2.raw_data);
-                    case 'HffCutoff'
-                        obj.hff_cutoff = typecast(s2.raw_data,'double');
-                    case 'IsAlarmedWave'
-                        obj.is_alarmed_wave = double(typecast(s2.raw_data,'uint32'));
-                    %}
                     case 'Host'
+                        obj.host = value;
                     otherwise
                         keyboard
                 end

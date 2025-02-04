@@ -19,14 +19,12 @@ classdef admin < epworks.p.parse_object
 
     methods
         function obj = admin(s,r)
-            obj.s = s;
-            n_children = length(s.child_indices);
-            for i = 1:n_children
-                index = s.child_indices(i);
-                r.processed(index) = true;
-                s2 = r.getStruct(index);
-
-                switch s2.name
+            p = s.props;
+            fn = fieldnames(p);
+            for i = 1:length(fn)
+                cur_name = fn{i};
+                value = p.(cur_name);
+                switch cur_name
                     %{
                     case 'AudioVolume'
                         obj.audio_volume = double(typecast(s2.raw_data,'uint32'));
@@ -42,7 +40,7 @@ classdef admin < epworks.p.parse_object
                     case 'CategoryLabel'
                     case 'ChartNoLabel'
                     case 'ID'
-                        obj.id = s2.raw_data;
+                        obj.id = value;
                         r.logID(obj,obj.id);
                     case 'IDLabel'
                     case 'RefPhysLabel'

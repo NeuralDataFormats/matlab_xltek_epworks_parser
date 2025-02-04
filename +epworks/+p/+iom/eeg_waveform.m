@@ -1,7 +1,7 @@
 classdef eeg_waveform < epworks.p.parse_object
     %
     %   Class:
-    %   epworks.p.trace.active_waveform_obj_id
+    %   epworks.p.iom.eeg_waveform
 
     properties (Hidden)
         id_props = {'parent'}

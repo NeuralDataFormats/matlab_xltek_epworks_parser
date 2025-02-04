@@ -17,8 +17,6 @@ classdef patient < epworks.p.parse_object
     end
 
     properties
-        s
-
         children
         studies
 

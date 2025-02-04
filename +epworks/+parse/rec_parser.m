@@ -51,9 +51,11 @@ classdef rec_parser < epworks.id_object
         
         waveforms %[1 x n], epworks.history.rec_waveform
         
+        all_data
         d1 = '----  Pointers to Other Objects  ----'
         trace
         ochan
+        
     end
     properties (Constant,Hidden)
         ID_PROP_INFO_1 = {
@@ -162,6 +164,10 @@ classdef rec_parser < epworks.id_object
 
             obj.waveforms = [entries{:}];
 
+            obj.all_data = vertcat(obj.waveforms.data);
+
+            return
+            
             keyboard
 
             for i = 1:n_waveforms

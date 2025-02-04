@@ -1,7 +1,7 @@
 classdef address < epworks.p.parse_object
     %
     %   Class:
-    %   epworks.p.patient.data.info.address
+    %   epworks.p.iom.patient.data.info.address
 
     properties
         s
@@ -18,24 +18,12 @@ classdef address < epworks.p.parse_object
 
     methods
         function obj = address(s,r)
-            obj.s = s;
-            n_children = length(s.child_indices);
-            for i = 1:n_children
-                index = s.child_indices(i);
-                r.processed(index) = true;
-                s2 = r.getStruct(index);
-
-                switch s2.name
-                    %{
-                    case 'AudioVolume'
-                        obj.audio_volume = double(typecast(s2.raw_data,'uint32'));
-                    case 'Color'
-                        obj.color = double(s2.raw_data);
-                    case 'HffCutoff'
-                        obj.hff_cutoff = typecast(s2.raw_data,'double');
-                    case 'IsAlarmedWave'
-                        obj.is_alarmed_wave = double(typecast(s2.raw_data,'uint32'));
-                    %}
+            p = s.props;
+            fn = fieldnames(p);
+            for i = 1:length(fn)
+                cur_name = fn{i};
+                value = p.(cur_name);
+                switch cur_name
                     case 'Address1'
                     case 'Address2'
                     case 'City'

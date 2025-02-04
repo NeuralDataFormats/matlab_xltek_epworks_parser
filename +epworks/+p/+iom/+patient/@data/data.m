@@ -1,7 +1,7 @@
 classdef data  < epworks.p.parse_object
     %
     %   Class:
-    %   epworks.p.eeg_waveform.data
+    %   epworks.p.iom.patient.data
 
     properties
         s
@@ -17,14 +17,12 @@ classdef data  < epworks.p.parse_object
 
     methods
         function obj = data(s,r)
-            obj.s = s;
-            n_children = length(s.child_indices);
-            for i = 1:n_children
-                index = s.child_indices(i);
-                r.processed(index) = true;
-                s2 = r.getStruct(index);
-
-                switch s2.name
+            p = s.props;
+            fn = fieldnames(p);
+            for i = 1:length(fn)
+                cur_name = fn{i};
+                value = p.(cur_name);
+                switch cur_name
                     %{
                     case 'AudioVolume'
                         obj.audio_volume = double(typecast(s2.raw_data,'uint32'));
@@ -37,17 +35,19 @@ classdef data  < epworks.p.parse_object
                     %}
 
                     case 'Connections'
-                        obj.connections = epworks.p.patient.data.connections(s2,r);
-                        r.logObject(obj.connections,index);
+                        obj.connections = epworks.p.iom.patient.data.connections(value,r);
                     case 'DesignatedReviewerLabel'
+                        obj.designated_reviewer_label = value;
                     case 'Info'
-                        obj.info = epworks.p.patient.data.info(s2,r);
-                        r.logObject(obj.info,index);
+                        obj.info = epworks.p.iom.patient.data.info(value,r);
                     case 'Insurance'
+                        obj.insurance = value;
                     case 'IsNew'
+                        obj.is_new = value;
                     case 'Schema'
-                    case 'Social Insurance'
-                   
+                        obj.schema = value;
+                    case 'Social_Insurance'
+                        obj.social_insurance = value;
                     otherwise
                         keyboard
                 end

@@ -17,7 +17,7 @@ classdef stims < epworks.p.parse_object
         aud_stim_output
         audio_onset
         audio_ramp
-        colour
+        color
         const_voltage
         contra_mode  
         delay
@@ -88,7 +88,7 @@ classdef stims < epworks.p.parse_object
                     case 'AudStimOutput'
                         obj.aud_stim_output = value;
                     case 'AudioOnset'
-                        obj.audio_onset value;
+                        obj.audio_onset = value;
                     case 'AudioRamp'
                         obj.audio_ramp = value;
                     case 'Colour'

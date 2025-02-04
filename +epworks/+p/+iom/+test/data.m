@@ -54,7 +54,7 @@ classdef data < epworks.p.parse_object
                     case 'TestSetObjCount'
                         obj.test_set_obj_count = value;
                     case 'VersionInfo'
-                        obj.version_info = epworks.p.iom.stest.version_info(value,r);
+                        obj.version_info = epworks.p.iom.test.version_info(value,r);
                     otherwise
                         keyboard
                 end

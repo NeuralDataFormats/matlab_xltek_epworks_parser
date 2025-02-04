@@ -1,7 +1,7 @@
 classdef version_info < epworks.p.parse_object
     %
     %   Class:
-    %   epworks.p.test.version_info
+    %   epworks.p.iom.test.version_info
 
     properties
         s
@@ -10,8 +10,7 @@ classdef version_info < epworks.p.parse_object
 
     methods
         function obj = version_info(s,r)
-            obj.s = s;
-            obj.raw_data = s.raw_data;
+            obj.raw_data = s;
         end
     end
 end

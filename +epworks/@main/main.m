@@ -6,34 +6,36 @@ classdef main < epworks.RNEL.handle_light
     %   This is the new main class for accessing data.
     
     properties
-        d1 = '----   IOM Objects   ----'
-        cursors %epworks.ep.cursor
-        freerun_waveforms %epworks.ep.cursor
-        groups %epworks.ep.group
-        patient %epworks.ep.patient
-        sets  %epworks.ep.set
-        study %epworks.ep.study
-        tests %epworks.ep.test
-        traces %ep.epworks.trace
-        triggered_waveforms %epworks.ep.triggered_waveform
-        d1_5 = '----  Moved Objects  -----'
-        baseline_sets
-        raw_sweep_sets
+        p
+        s
+        % d1 = '----   IOM Objects   ----'
+        % cursors %epworks.ep.cursor
+        % freerun_waveforms %epworks.ep.cursor
+        % groups %epworks.ep.group
+        % patient %epworks.ep.patient
+        % sets  %epworks.ep.set
+        % study %epworks.ep.study
+        % tests %epworks.ep.test
+        % traces %ep.epworks.trace
+        % triggered_waveforms %epworks.ep.triggered_waveform
+        % d1_5 = '----  Moved Objects  -----'
+        % baseline_sets
+        % raw_sweep_sets
     end
     
     properties
-        d2 = '----   History Files   -----'
-        rec_files %epworks.rec_file
-        dat_file
-        notes
+        % d2 = '----   History Files   -----'
+        % rec_files %epworks.rec_file
+        % dat_file
+        % notes
     end
     
     properties
-        d4 = '----  Debugging IOM  ----'
-        non_dom_names
-        ignored_names
-        d5 = '----  Others   ----'
-        id_man
+        % d4 = '----  Debugging IOM  ----'
+        % non_dom_names
+        % ignored_names
+        % d5 = '----  Others   ----'
+        % id_man
     end
     
     
@@ -45,7 +47,9 @@ classdef main < epworks.RNEL.handle_light
                 study_name_or_path = '';
             end
 
-            parsed_data = epworks.parse.main(study_name_or_path);
+            obj.p = epworks.parse.main(study_name_or_path);
+            obj.s = obj.p.iom.s2;
+            return
 
 
             %Old code at this point ...

@@ -14,37 +14,20 @@ classdef info  < epworks.p.parse_object
 
     methods
         function obj = info(s,r)
-            obj.s = s;
-            n_children = length(s.child_indices);
-            for i = 1:n_children
-                index = s.child_indices(i);
-                r.processed(index) = true;
-                s2 = r.getStruct(index);
-
-                switch s2.name
-                    %{
-                    case 'AudioVolume'
-                        obj.audio_volume = double(typecast(s2.raw_data,'uint32'));
-                    case 'Color'
-                        obj.color = double(s2.raw_data);
-                    case 'HffCutoff'
-                        obj.hff_cutoff = typecast(s2.raw_data,'double');
-                    case 'IsAlarmedWave'
-                        obj.is_alarmed_wave = double(typecast(s2.raw_data,'uint32'));
-                    %}
-
+            p = s.props;
+            fn = fieldnames(p);
+            for i = 1:length(fn)
+                cur_name = fn{i};
+                value = p.(cur_name);
+                switch cur_name
                     case 'Address'
-                        obj.address = epworks.p.patient.data.info.address(s2,r);
-                        r.logObject(obj.address,index);
+                        obj.address = epworks.p.iom.patient.data.info.address(value,r);
                     case 'Admin'
-                        obj.admin = epworks.p.patient.data.info.admin(s2,r);
-                        r.logObject(obj.admin,index);
+                        obj.admin = epworks.p.iom.patient.data.info.admin(value,r);
                     case 'Name'
-                        obj.name = epworks.p.patient.data.info.name(s2,r);
-                        r.logObject(obj.name,index);
+                        obj.name = epworks.p.iom.patient.data.info.name(value,r);
                     case 'Personal'
-                        obj.personal = epworks.p.patient.data.info.personal(s2,r);
-                        r.logObject(obj.personal,index);
+                        obj.personal = epworks.p.iom.patient.data.info.personal(value,r);
                     otherwise
                         keyboard
                 end

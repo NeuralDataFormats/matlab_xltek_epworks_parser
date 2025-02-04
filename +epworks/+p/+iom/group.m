@@ -1,7 +1,7 @@
 classdef group < epworks.p.parse_object
     %
     %   Class:
-    %   epworks.p.group
+    %   epworks.p.iom.group
     %
     %   See Also
     %   --------

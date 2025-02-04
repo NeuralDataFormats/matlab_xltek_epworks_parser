@@ -39,8 +39,6 @@ classdef main < handle
             obj.file_manager = epworks.file_manager(study_name_or_path);
 
             obj.iom = epworks.parse.iom_parser(obj.file_manager.iom_file_path);
-
-            keyboard
             
             %Rec file 
             %--------------------------------------------------------------
@@ -61,6 +59,7 @@ classdef main < handle
             %           - is it my local, or Pitt local?
 
             s = obj.iom.s2;
+
             keyboard
 
             all_rec_files = [obj.file_manager.rec_file_paths{:}];
@@ -71,11 +70,17 @@ classdef main < handle
             
             for iRec = 1:n_rec_files
                 rec_files_cell{iRec} = epworks.parse.rec_parser(all_rec_files{iRec});
-                keyboard
             end
             
             obj.rec_files = [rec_files_cell{:}];
             %--------------------------------------------------------------
+            clf
+            hold on
+            for i = 1:length(obj.rec_files)
+                plot(obj.rec_files(i).all_data)
+            end
+            hold off
+
 
             keyboard
 

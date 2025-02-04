@@ -121,6 +121,15 @@ classdef iom_parser < handle
             end
             %not logging the objs
             obj.s2 = s2;
+
+            keyboard
+            r.doObjectLinking();
+            r.convertChildrenToProps();
+
+            %------------------------------------------
+            %TODO:
+            %1) link IDs
+            %2) 
         end
     end
 end
