@@ -12,7 +12,6 @@ classdef entry < epworks.RNEL.handle_light
        title
        comment
        created_time
-       created_time_string
     end
     
     %Still debugging these ...
@@ -46,8 +45,8 @@ classdef entry < epworks.RNEL.handle_light
                       stop_index  = typecast(uint8(cur_text(3:6)),'uint32');
                       obj.comment = cur_text(7:stop_index);
                   case 4 %CreationTimestamp
-                      obj.created_time = epworks.sl.datetime.msBase1601ToMatlab(typecast(uint8(cur_text(7:14)),'uint64'));
-                      obj.created_time_string = datestr(obj.created_time);
+                      temp = uint8(cur_text(7:14));
+                      obj.created_time = epworks.utils.processType3time(temp);
                   case 5 %Creator
                   case 6 %Administrator
                   case 7 %EndTimestamp

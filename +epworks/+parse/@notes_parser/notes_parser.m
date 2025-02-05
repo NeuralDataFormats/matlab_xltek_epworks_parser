@@ -1,7 +1,7 @@
-classdef notes < epworks.RNEL.handle_light
+classdef notes_parser < handle
     %
     %   Class:
-    %   epworks.notes
+    %   epworks.parse.notes_parser
     %
     %   This class holds all of the notes entries. It was the first file
     %   that I tried to parse since the object seemed fairly simple.
@@ -25,9 +25,10 @@ classdef notes < epworks.RNEL.handle_light
     end
     
     properties (Constant)
-        TAG_LIST = {'Category' 'ChangeHistory' 'Comment' 'CreationTimestamp' ...
-            'Creator' 'Administrator' 'EndTimestamp' 'LastChangeTimestamp' ...
-            'ModificationTimestamp' 'StartTimestamp' 'Title' 'Type' 'UserDeleted'};
+        TAG_LIST = {'Category' 'ChangeHistory' 'Comment' ...
+            'CreationTimestamp' 'Creator' 'Administrator' ...
+            'EndTimestamp' 'LastChangeTimestamp' 'ModificationTimestamp'...
+            'StartTimestamp' 'Title' 'Type' 'UserDeleted'};
         %TIMESTAMPS:
         %------------------------------------------------------------------
         %Followed by: [0 3 13 0 0 0] - not sure of the meaning
@@ -59,7 +60,7 @@ classdef notes < epworks.RNEL.handle_light
     end
     
     methods
-        function obj = notes(notes_file_path)
+        function obj = notes_parser(notes_file_path)
            %
            
            %Reading the file 
@@ -82,15 +83,18 @@ classdef notes < epworks.RNEL.handle_light
            
            %I could probably pass this into the constructor to do the loop
            %..., but I really dislike the null call in the constructor ...
+           temp_objs = cell(1,n_groups);
            for iGroup = 1:n_groups
-              temp_obj(iGroup) = epworks.notes.entry(...
+               temp_objs{iGroup} = epworks.p.notes.entry(...
                   obj.tag_id_groups{iGroup},obj.tag_text_groups{iGroup});
            end
+
+           temp_objs = [temp_objs{:}];
            
-           times = [temp_obj.created_time];
+           times = [temp_objs.created_time];
            [~,I_Sort] = sort(times);
            
-           obj.entries = temp_obj(I_Sort);
+           obj.entries = temp_objs(I_Sort);
         end
     end
     

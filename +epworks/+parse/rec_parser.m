@@ -35,23 +35,19 @@ classdef rec_parser < handle
         first_unknown   %A value of 2 has always been observed 
 
         file_timestamp  %matlab time converted to seconds
-        trace_ID 
-        ochan_ID
         default_length %Length of each section of data
         
         waveforms %[1 x n], epworks.history.rec_waveform
         
-        all_data
+        merged_waveforms
+
         trace
         ochan
         fs
+
+        %all_first_100
     end
-    properties (Constant,Hidden)
-        ID_PROP_INFO_1 = {
-            'trace_ID'   'trace'
-            'ochan_ID'   'ochan'
-            }
-    end
+
     methods
         function obj = rec_parser(file_path,logger)
             
@@ -72,7 +68,7 @@ classdef rec_parser < handle
             %    - 'first_ID'
             %2) 4 bytes
             %    - 17:20
-            %    - only the  value 2 has been observed
+            %    - only the value 2 has been observed
             %    - 'first_unknown'
             %3) 8 bytes
             %    - 21:28
@@ -102,11 +98,12 @@ classdef rec_parser < handle
                         
             other_IDs = reshape(intro(29:60),16,2)';
             
-            obj.trace_ID = other_IDs(1,:);
-            obj.ochan_ID = other_IDs(2,:);
-            obj.trace = logger.getObjectByID(obj.trace_ID);
-            obj.ochan = logger.getObjectByID(obj.ochan_ID);
+            trace_ID = other_IDs(1,:);
+            ochan_ID = other_IDs(2,:);
+            obj.trace = logger.getObjectByID(trace_ID);
+            obj.ochan = logger.getObjectByID(ochan_ID);
 
+            %Link this object from the trace
             obj.trace.rec_data = obj;
 
             obj.name = obj.trace.name;
@@ -116,6 +113,12 @@ classdef rec_parser < handle
             if ~all(intro(65:96) == 0)
                 error('Padded zeros assumption violated')
             end
+
+            %Note, this assumes eeg_waveforms
+            %
+            %   TODO: Determine type automatically
+            eeg_info = obj.trace.eeg_waveforms.data;
+            obj.fs = eeg_info.samp_freq/eeg_info.timebase;
             
             %Data Processing
             %---------------------------------------------------------------            
@@ -127,26 +130,57 @@ classdef rec_parser < handle
             n_waveforms = bytes_remaining/obj.default_length;
             
             if n_waveforms ~= floor(n_waveforms)
-
                 %Note, if this is ever violated we can just rewrite the
                 %code to do one at a time and grow the results object
                 error('Constant length assumption violated')
             end
 
+            %TODO: Best to not reshape and to iterate through
+            %starts and stops ...
             data_matrix = reshape(d2,obj.default_length,n_waveforms);
 
             entries = cell(1,n_waveforms);
             for i = 1:n_waveforms
                 entries{i} = epworks.p.rec.waveform(i,data_matrix(:,i),...
-                    obj.default_length,obj.trace,obj.ochan);
+                    obj.default_length,obj.trace,obj.ochan,obj.fs);
             end
 
             obj.waveforms = [entries{:}];
 
-            eeg_info = obj.trace.eeg_waveforms.data;
-            obj.fs = eeg_info.samp_freq/eeg_info.timebase;
+            %obj.all_first_100 = vertcat(obj.waveforms.first_100);
 
+            CUTOFF_RATIO = 1;
+            dt = 1/obj.fs;
+            is_start = false(1,n_waveforms);
+            is_start(1) = true;
+            is_stop = false(1,n_waveforms);
+            is_stop(end) = true;
+            for i = 1:(n_waveforms-1)
+                w1 = obj.waveforms(i);
+                t1 = w1.t_end;
+                w2 = obj.waveforms(i+1);
+                t2 = w2.t_1;
+                delta_time = abs(seconds(t2-t1) - dt);
+                if delta_time/dt < CUTOFF_RATIO
+                    %continue
+                else
+                    is_stop(i) = true;
+                    is_start(i+1) = true;
+                end
+            end
+
+            I1 = find(is_start);
+            I2 = find(is_stop);
+            n_merged = length(I1);
+            merged_all = cell(1,n_merged);
+            for i = 1:n_merged
+                waves_use = obj.waveforms(I1(i):I2(i));
+                merged_all{i} = epworks.p.rec.merged_waveform(waves_use);
+            end
+
+            obj.merged_waveforms = [merged_all{:}];
         end
+
         function plot(obj,varargin)
 
             in.y_shift = 0;
@@ -162,14 +196,11 @@ classdef rec_parser < handle
             next_color = colors(index,:);
             hold on
             
-            for i = 1:length(obj.waveforms)
-                y = obj.waveforms(i).data;
-                t0 = obj.waveforms(i).timestamp;
+            for i = 1:length(obj.merged_waveforms)
+                y = obj.merged_waveforms(i).data;
+                t = obj.merged_waveforms(i).time;
 
-                dt = 1/obj.fs;
                 half = obj.fs/2;
-                n_samples = length(y);
-                t = t0 + seconds(((1:n_samples)*dt));
 
                 %Filtering details in:
                 %s.test.data.settings.eeg.applied_montage_key_tree.channels

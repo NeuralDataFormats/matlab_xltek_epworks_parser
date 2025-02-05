@@ -8,18 +8,35 @@ classdef waveform < epworks.p.parse_object
     %   epworks.parse.rec_parser
 
     properties
+        first_100
         timestamp
         id
         data
-        d2
+        fs
+    end
+
+    properties (Dependent)
+        t_1
+        t_end
     end
 
     methods
-        function obj = waveform(i,data,default_length,trace,ochan)
-            %
+        function value = get.t_1(obj)
+            value = obj.timestamp;
+        end
+        function value = get.t_end(obj)
+            value = obj.timestamp + seconds((length(obj.data)-1)*1/obj.fs);
+        end
+    end
+
+    methods
+        function obj = waveform(i,data,default_length,trace,ochan,fs)
+            obj.fs = fs;
 
             bytes = data';
 
+            %Format
+            %------
             %1:4 - # of bytes to read at a time
             %5:20 - id
             %21:28 - timestamp
@@ -27,7 +44,7 @@ classdef waveform < epworks.p.parse_object
             %42 - value of 64 - is this a # of columns/rows thing?
             %45 - starts counting up, 1 through n
             %       - why start counting before a meaningful number
-            %        at byte 46?
+            %        at byte 46? What happens if we overflowed
             %46:48 - value of [202 154 59]
             %
             %   45:48 => 1E9+1
@@ -53,13 +70,14 @@ classdef waveform < epworks.p.parse_object
             obj.id = bytes(5:20);
             obj.timestamp = epworks.utils.processType3time(bytes(21:28));
 
-            % if i > 40 && contains(string(trace.name),'F3')
-            %     keyboard
-            % end
+            obj.first_100 = bytes(1:100);
+
+
 
             %892 - first non-zero sample
+            %
+            %   ? How do we determine this from the data?
             obj.data = double(typecast(bytes(889:end),'single'));
-            obj.d2 = double(typecast(bytes(89:end),'single'));
             %obj.data = data(89:end);
 
             %{

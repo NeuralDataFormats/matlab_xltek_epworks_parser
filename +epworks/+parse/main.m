@@ -34,6 +34,8 @@ classdef main < handle
         history
 
         rec_files
+
+        notes
     end
 
     methods
@@ -48,8 +50,6 @@ classdef main < handle
             obj.history = epworks.parse.history_dat_parser(...
                 obj.file_manager.history_dat_path,obj.iom.logger);
 
-            
-            
             %Rec file 
             %--------------------------------------------------------------
             %
@@ -68,8 +68,6 @@ classdef main < handle
             %       - program is showing local, how?
             %           - is it my local, or Pitt local?
 
-            s = obj.iom.s2;
-
             all_rec_files = [obj.file_manager.rec_file_paths{:}];
             
             n_rec_files = length(all_rec_files);
@@ -80,26 +78,10 @@ classdef main < handle
                 rec_files_cell{iRec} = epworks.parse.rec_parser(all_rec_files{iRec},obj.iom.logger);
             end
             
-            obj.rec_files = [rec_files_cell{:}];
-            keyboard
-            %--------------------------------------------------------------
-            clf
-            hold on
-            plot(obj.rec_files(10))
-            plot(obj.rec_files(11),'y_shift',200)
-            hold off
-            legend()
-            set(gca,'FontSize',16)
+            obj.rec_files = [rec_files_cell{:}]; 
 
-            hold on
-            for i = 1:length(obj.rec_files)
-                plot(obj.rec_files(i))
-            end
-            hold off
-
-
-            keyboard
-
+            obj.notes = epworks.parse.notes_parser(...
+                obj.file_manager.notes_file_path);
         end
     end
 end
