@@ -2,6 +2,10 @@ classdef raw_array
     %
     %   Class:
     %   epworks.parse.iom.raw_array
+    %
+    %   See Also
+    %   --------
+    %   epworks.parse.iom.raw_object
 
     properties
         n_entries

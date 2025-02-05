@@ -20,7 +20,11 @@ classdef rec_parser < handle
     
     properties
         file_path
+        file_name
+        folder_time
+
         name
+
         first_ID %The first ID seen in the file. This is the same
         %for all .REC files I've seen;
         %
@@ -44,7 +48,6 @@ classdef rec_parser < handle
         trace
         ochan
         fs
-
         %all_first_100
     end
 
@@ -54,6 +57,21 @@ classdef rec_parser < handle
             INTRO_BYTE_LENGTH = 96;
 
             obj.file_path = file_path;
+
+            [root,obj.file_name] = fileparts(file_path);
+            %The timing info is in the name of the parent folder
+            %so go up one more level
+            [~,~,ext] = fileparts(root);
+            %The period '.' in the folder path causes the part we care
+            %about to be in the extension not in the name
+            %
+            %   Note, we could alternatively parse the the folder name
+
+            %start at 2 to skip period
+            temp = epworks.utils.hex2bytes(ext(2:end));
+
+            %Stored in reverse byte order, flip and pass in
+            obj.folder_time = epworks.utils.processType3time(temp(end:-1:1));
             
             r = epworks.sl.io.fileRead(file_path,'*uint8');
 

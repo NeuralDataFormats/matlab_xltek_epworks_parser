@@ -52,7 +52,6 @@ classdef logger < handle
         function doObjectLinking(obj)
             %
             %
-            %   Called by: epworks.iom_parser.translateData
             
             %Logging is simply to make it easier to iterate over
             %the objects

@@ -4,8 +4,12 @@ classdef raw_object
     %   epworks.parse.iom.raw_object
     %
     %   Maybe rename as raw_entry or something
-
-
+    %
+    %   This gets called when the raw byte stream detects an object.
+    %
+    %   See Also
+    %   --------
+    %   epworks.parse.iom.raw_array
 
     properties
         n_bytes_to_next

@@ -8,34 +8,15 @@ classdef main < epworks.RNEL.handle_light
     properties
         p
         s
-        % d1 = '----   IOM Objects   ----'
-        % cursors %epworks.ep.cursor
-        % freerun_waveforms %epworks.ep.cursor
-        % groups %epworks.ep.group
-        % patient %epworks.ep.patient
-        % sets  %epworks.ep.set
-        % study %epworks.ep.study
-        % tests %epworks.ep.test
-        % traces %ep.epworks.trace
-        % triggered_waveforms %epworks.ep.triggered_waveform
-        % d1_5 = '----  Moved Objects  -----'
-        % baseline_sets
-        % raw_sweep_sets
+        traces
+        eeg_waveforms
     end
     
     properties
-        % d2 = '----   History Files   -----'
-        % rec_files %epworks.rec_file
-        % dat_file
-        % notes
+
     end
     
     properties
-        % d4 = '----  Debugging IOM  ----'
-        % non_dom_names
-        % ignored_names
-        % d5 = '----  Others   ----'
-        % id_man
     end
     
     
@@ -49,78 +30,42 @@ classdef main < epworks.RNEL.handle_light
 
             obj.p = epworks.parse.main(study_name_or_path);
             obj.s = obj.p.iom.s2;
-            return
+            
+            %I don't like where this object lives but I think
+            %is is fine to use ...
+            logger = epworks.parse.iom.logger();
+            %TODO: Get from other logger
+            logger.first_past_object_count = 1e5;
+            logger.initializeObjectHolder();
+            
 
+            p_eeg = obj.s.trace;
+            temp_objs = cell(1,length(p_eeg));
+            for i = 1:length(p_eeg)
+                temp_objs{i} = epworks.objects.trace(obj.p,p_eeg(i),logger);
+            end
+
+            obj.traces = [temp_objs{:}];
+
+            p_eeg = obj.s.eeg_waveform;
+            temp_objs = cell(1,length(p_eeg));
+            for i = 1:length(p_eeg)
+                temp_objs{i} = epworks.objects.eeg_waveform(obj.p,p_eeg(i),logger);
+            end
+            
+            obj.eeg_waveforms = [temp_objs{:}];
+            
+            logger.doObjectLinking();
+
+            for i = 1:length(obj.eeg_waveforms)
+                w = obj.eeg_waveforms(i);
+                w.data = w.trace.data;
+            end
 
             %Old code at this point ...
             %--------------------------------------------------------------
             
-            %Class: epworks.file_manager
-            file_manager = epworks.file_manager(study_name_or_path);
             
-            %Class: epworks.iom_parser
-            parsed_iom_data = epworks.iom_parser(file_manager.iom_file_path);
-            
-            obj.populateIOMObjects(parsed_iom_data);
-            
-            %Hack, fixes stim objects in settings ...
-            settings_objects = [obj.tests.Settings];
-            settings_objects.fixStimsObjects();
-            
-            %rec files
-            %---------------------------------------------------------------
-            all_rec_files = [file_manager.rec_file_paths{:}];
-            
-            n_rec_files = length(all_rec_files);
-            
-            rec_files_cell = cell(1,n_rec_files);
-            
-            for iRec = 1:n_rec_files
-                rec_files_cell{iRec} = epworks.history.rec_file(all_rec_files{iRec});
-            end
-            
-            obj.rec_files = [rec_files_cell{:}];
-            
-            %history dat file
-            %---------------------------------------------------------------
-            if exist(file_manager.history_dat_path,'file')
-                obj.dat_file = epworks.history.dat_file(file_manager.history_dat_path);
-            end
-            
-            %notes files
-            %---------------------------------------------------------------
-            notes_file_path = file_manager.notes_file_path;
-            if ~isempty(notes_file_path)
-                obj.notes = epworks.notes(notes_file_path);
-            end
-            
-            %Id Linking
-            %---------------------------------------------------------------
-            obj.id_man = epworks.id_manager(obj);
-            
-            %This bit of code links the rec_file_wavforms to the triggered
-            %waveforms. I haven't been able to match the other IDs, with
-            %the exception of the history file, although I don't know if
-            %that does any good ...
-            if ~isempty(obj.rec_files)
-                r     = obj.rec_files;
-                w     = [r.waveforms];
-                wids  = vertcat(w.ID);
-                tw    = obj.triggered_waveforms;
-                twids = vertcat(tw.ID);
-                [mask,loc] = ismember(wids,twids,'rows');
-                if any(mask)
-                    matching_tw      = tw(loc(mask));
-                    matching_tw_cell = num2cell(matching_tw);
-                    [w(mask).triggered_waveform] = deal(matching_tw_cell{:});
-                    w_cell = num2cell(w(mask));
-                    [matching_tw(mask).rec_file_waveform] = deal(w_cell{:}); %#ok<NASGU>
-                end
-            end
-            
-            %Reorganizing results
-            %---------------------------------------------------------------
-            obj.sortObjects();
             
             %tst files
             %---------------------------------------------------------------
