@@ -4,6 +4,10 @@ classdef rec_file < epworks.id_object
     %   epworks.history.rec_file
     %
     %   Contains results of parsed .REC files in the histroy folders
+    %
+    %   Format:
+    %   - header
+    %   - followed by waveforms
     
     
     properties (Hidden)

@@ -1,4 +1,4 @@
-classdef user_options < epworks.RNEL.handle_light
+classdef user_options < handle
     %
     %   This class is meant to handle parsing of user defined variables.
     %
