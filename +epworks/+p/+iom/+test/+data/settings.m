@@ -3,6 +3,10 @@ classdef settings < epworks.p.parse_object
     %   Class:
     %   epworks.p.test.settings
 
+    properties (Hidden)
+        id_props = {'active_layout'}
+    end
+
     properties
         active_layout
         app_test_settings

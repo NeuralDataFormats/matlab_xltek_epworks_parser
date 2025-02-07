@@ -8,8 +8,6 @@ classdef set < epworks.p.parse_object
     end
 
     properties
-        s
-        
         children
         n_children
         data

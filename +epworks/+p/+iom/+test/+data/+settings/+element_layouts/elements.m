@@ -4,6 +4,7 @@ classdef elements < epworks.p.parse_object
     %   epworks.p.test.data.settings.element_layouts.elements
 
     properties
+        dsa_spectral_eeg_view
         eeg_waveform_view
         group_dir_view
         history_view
@@ -32,6 +33,8 @@ classdef elements < epworks.p.parse_object
                 cur_name = fn{i};
                 value = p.(cur_name);
                 switch cur_name
+                    case 'DSASpectralEegView'
+                        obj.eeg_waveform_view = epworks.p.iom.test.data.settings.element_layouts.elements.dsa_spectral_eeg_view(value,r);
                     case 'EegWaveformView'
                         obj.eeg_waveform_view = epworks.p.iom.test.data.settings.element_layouts.elements.eeg_waveform_view(value,r);
                     case 'GroupDirView'

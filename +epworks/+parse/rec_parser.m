@@ -49,6 +49,7 @@ classdef rec_parser < handle
         ochan
         fs
         %all_first_100
+
     end
 
     methods
@@ -135,8 +136,13 @@ classdef rec_parser < handle
             %Note, this assumes eeg_waveforms
             %
             %   TODO: Determine type automatically
-            eeg_info = obj.trace.eeg_waveforms.data;
-            obj.fs = eeg_info.samp_freq/eeg_info.timebase;
+            if ~isempty(obj.trace.eeg_waveforms)
+                info = obj.trace.eeg_waveforms(1).data;
+            else
+                info = obj.trace.triggered_waveforms(1).data;
+            end
+
+            obj.fs = info.samp_freq/info.timebase;
             
             %Data Processing
             %---------------------------------------------------------------            
@@ -167,6 +173,11 @@ classdef rec_parser < handle
 
             %obj.all_first_100 = vertcat(obj.waveforms.first_100);
 
+
+
+            %TODO: We could probably omit this for triggered waveforms
+            %
+            %   This IS needed for eeg_waveforms
             CUTOFF_RATIO = 1;
             dt = 1/obj.fs;
             is_start = false(1,n_waveforms);

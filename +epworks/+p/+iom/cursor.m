@@ -1,20 +1,7 @@
-classdef study < epworks.p.parse_object
+classdef cursor < epworks.p.parse_object
     %
     %   Class:
-    %   epworks.p.study
-    %
-    %   See Also
-    %   --------
-    %   epworks.p.patient
-    %   epworks.p.test
-    %   epworks.p.study.children
-    %   epworks.p.study.data
-    %
-    %   Hierarchy
-    %   ----------
-    %   - patient
-    %       - study
-    %           - test
+    %   epworks.p.iom.cursor
 
     properties (Hidden)
         id_props = {'parent'}
@@ -22,8 +9,6 @@ classdef study < epworks.p.parse_object
 
     properties
         children
-        tests
-
         data
 
         id
@@ -41,7 +26,7 @@ classdef study < epworks.p.parse_object
     end
 
     methods
-        function obj = study(s,r)
+        function obj = cursor(s,r)
             r.logObject(obj);
             p = s.props;
             fn = fieldnames(p);
@@ -52,10 +37,10 @@ classdef study < epworks.p.parse_object
                     case 'Children'
                         obj.children = value;
                     case 'Data'
-                        obj.data = epworks.p.iom.study.data(value,r);
+                        obj.data = epworks.p.iom.cursor.data(value,r);
                     case 'Id'
                         obj.id = value;
-                        r.logID(obj,value);
+                        r.logID(obj,obj.id);
                     case 'IsRoot'
                         obj.is_root = value;
                     case 'Parent'
@@ -68,12 +53,8 @@ classdef study < epworks.p.parse_object
                         keyboard
                 end
             end
-        end
-        function childrenToProps(obj,logger)
-            class_names = cellfun(@epworks.utils.getShortClassName,obj.children,'un',0);
 
-            mask = class_names == "test";
-            obj.tests = [obj.children{mask}];
+
         end
     end
 end

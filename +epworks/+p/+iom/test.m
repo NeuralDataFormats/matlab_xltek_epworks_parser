@@ -18,8 +18,6 @@ classdef test < epworks.p.parse_object
     end
 
     properties
-        s
-
         children
 
         groups
@@ -69,7 +67,7 @@ classdef test < epworks.p.parse_object
                 end
             end
         end
-        function childrenToProps(obj)
+        function childrenToProps(obj,logger)
             class_names = cellfun(@epworks.utils.getShortClassName,obj.children,'un',0);
 
             mask = class_names == "group";

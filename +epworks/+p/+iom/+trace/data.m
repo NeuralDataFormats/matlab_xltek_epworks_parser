@@ -14,14 +14,18 @@ classdef data < epworks.p.parse_object
     properties
         name
         create_time
+        create_time_part2
         active_waveform_obj
         test_obj
         group_obj
+        max_num_historical_trigs
         o_chan
         origin_x
         origin_y
+        private_request
         last_recorded_set_number
-
+        random_guid
+        rejection_originator
         %Some enumeration
         state
     end
@@ -39,9 +43,12 @@ classdef data < epworks.p.parse_object
                     case 'ActiveWaveformObjId'
                         obj.active_waveform_obj = value;
                     case 'CreateTime'
-                        obj.create_time = epworks.utils.processType3time(value);
+                        obj.create_time = epworks.utils.processType3time(value(1:8));
+                        obj.create_time_part2 = double(typecast(value(9:16),'int32'));
                     case 'GroupObjId'
                         obj.group_obj = value;
+                    case 'MaxNumHistoricalTriggs'
+                        obj.max_num_historical_trigs = value;
                     case 'Name'
                         obj.name = value;
                     case 'OChanId'
@@ -51,6 +58,13 @@ classdef data < epworks.p.parse_object
                         obj.origin_x = value;
                     case 'OriginY'
                         obj.origin_y = value;
+                    case 'PrivateRequest'
+                        obj.private_request = value;
+                    case 'RandomGUID'
+                        %Do we link this to anything?
+                        obj.random_guid = value;
+                    case 'RejectionOriginator'
+                        obj.rejection_originator = value;
                     case 'State'
                         obj.state = value;
                     case 'TestObjId'

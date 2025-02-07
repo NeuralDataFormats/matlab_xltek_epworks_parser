@@ -22,6 +22,7 @@ classdef stims < epworks.p.parse_object
         divisions
         id
         init_intensity
+        intensity
         inter_pulse_duration
         ipsi_mode
         is_active_high
@@ -108,6 +109,8 @@ classdef stims < epworks.p.parse_object
                         r.logID(obj,obj.id);
                     case 'InitIntensity'
                         obj.init_intensity = value;
+                    case 'Intensity'
+                        obj.intensity = value;
                     case 'InterPulseDuration'
                         obj.inter_pulse_duration = value;
                     case 'IpsiMode'

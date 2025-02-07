@@ -4,6 +4,8 @@ classdef manufacturing_test < epworks.p.parse_object
     %   epworks.p.test.data.settings.manufacturing_test
 
     properties
+        active_channel
+        active_electrode
         allowed_crosstalk_ratio
         allowed_dc_offset
         allowed_deviation_percent
@@ -25,26 +27,30 @@ classdef manufacturing_test < epworks.p.parse_object
                 cur_name = fn{i};
                 value = p.(cur_name);
                 switch cur_name
-                    %{
-                    case 'AudioVolume'
-                        obj.audio_volume = double(typecast(s2.raw_data,'uint32'));
-                    case 'Color'
-                        obj.color = double(s2.raw_data);
-                    case 'HffCutoff'
-                        obj.hff_cutoff = typecast(s2.raw_data,'double');
-                    case 'IsAlarmedWave'
-                        obj.is_alarmed_wave = double(typecast(s2.raw_data,'uint32'));
-                    %}
+                    case 'ActiveChannel'
+                        obj.active_channel = value;
+                    case 'ActiveElectrode'
+                        obj.active_electrode = value;
                     case 'AllowedCrossTalkRatio'
+                        obj.allowed_crosstalk_ratio = value;
                     case 'AllowedDCOffset'
+                        obj.allowed_dc_offset = value;
                     case 'AllowedDeviationPercent'
+                        obj.allowed_deviation_percent = value;
                     case 'AllowedNoiseLevel'
+                        obj.allowed_noise_level = value;
                     case 'CyclingPeriod'
+                        obj.cycling_period = value;
                     case 'IsCrossTalkTest'
+                        obj.is_crosstalk_test = value;
                     case 'IsManufacturingTest'
+                        obj.is_manufacturing_test = value;
                     case 'MinCrossTalkRatio'
+                        obj.min_crosstalk_ratio = value;
                     case 'ReferenceSignalFrequency'
+                        obj.reference_siganl_frequency = value;
                     case 'ReferenceSignalP2P'
+                        obj.reference_signal_p2p = value;
                     otherwise
                         keyboard
                 end

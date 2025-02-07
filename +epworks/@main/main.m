@@ -4,12 +4,31 @@ classdef main < epworks.RNEL.handle_light
     %   epworks.main
     %
     %   This is the new main class for accessing data.
-    
+    %
+    %   Hierarchy
+    %   ---------
+    %   patient
+    %     study
+    %       test
+    %         group
+    %           trace
+    %             eeg_waveform
+    %             triggered_waveform
+    %             freerun_waveform
     properties
         p
         s
         traces
+        groups
+        tests
         eeg_waveforms
+        triggered_waveforms
+        freerun_waveforms
+
+        %Not yet exposed - these are parsed
+
+        %patien
+        %study
     end
     
     properties
@@ -39,26 +58,64 @@ classdef main < epworks.RNEL.handle_light
             logger.initializeObjectHolder();
             
 
-            p_eeg = obj.s.trace;
-            temp_objs = cell(1,length(p_eeg));
-            for i = 1:length(p_eeg)
-                temp_objs{i} = epworks.objects.trace(obj.p,p_eeg(i),logger);
+            p_obj = obj.s.trace;
+            temp_objs = cell(1,length(p_obj));
+            for i = 1:length(p_obj)
+                temp_objs{i} = epworks.objects.trace(obj.p,p_obj(i),logger);
             end
-
             obj.traces = [temp_objs{:}];
 
-            p_eeg = obj.s.eeg_waveform;
-            temp_objs = cell(1,length(p_eeg));
-            for i = 1:length(p_eeg)
-                temp_objs{i} = epworks.objects.eeg_waveform(obj.p,p_eeg(i),logger);
+            p_obj = obj.s.eeg_waveform;
+            temp_objs = cell(1,length(p_obj));
+            for i = 1:length(p_obj)
+                temp_objs{i} = epworks.objects.eeg_waveform(obj.p,p_obj(i),logger);
             end
-            
             obj.eeg_waveforms = [temp_objs{:}];
+
+            p_obj = obj.s.group;
+            temp_objs = cell(1,length(p_obj));
+            for i = 1:length(p_obj)
+                temp_objs{i} = epworks.objects.group(obj.p,p_obj(i),logger);
+            end
+            obj.groups = [temp_objs{:}];
+
+            p_obj = obj.s.test;
+            temp_objs = cell(1,length(p_obj));
+            for i = 1:length(p_obj)
+                temp_objs{i} = epworks.objects.test(obj.p,p_obj(i),logger);
+            end
+            obj.tests = [temp_objs{:}];
+            
+            p_obj = obj.s.triggered_waveform;
+            temp_objs = cell(1,length(p_obj));
+            for i = 1:length(p_obj)
+                temp_objs{i} = epworks.objects.triggered_waveform(obj.p,p_obj(i),logger);
+            end
+            obj.triggered_waveforms = [temp_objs{:}];
+
+            p_obj = obj.s.freerun_waveform;
+            temp_objs = cell(1,length(p_obj));
+            for i = 1:length(p_obj)
+                temp_objs{i} = epworks.objects.freerun_waveform(obj.p,p_obj(i),logger);
+            end
+            obj.freerun_waveforms = [temp_objs{:}];
             
             logger.doObjectLinking();
 
+            %This needs to be done after linking since the linking
+            %trades the ID for the created object
             for i = 1:length(obj.eeg_waveforms)
                 w = obj.eeg_waveforms(i);
+                w.data = w.trace.data;
+            end
+
+            for i = 1:length(obj.triggered_waveforms)
+                w = obj.triggered_waveforms(i);
+                w.data = w.trace.data;
+            end
+
+            for i = 1:length(obj.freerun_waveforms)
+                w = obj.freerun_waveforms(i);
                 w.data = w.trace.data;
             end
 

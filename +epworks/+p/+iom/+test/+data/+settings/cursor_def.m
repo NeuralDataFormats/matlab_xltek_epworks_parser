@@ -4,7 +4,7 @@ classdef cursor_def < epworks.p.parse_object
     %   epworks.p.iom.test.data.settings.cursor_calc
 
     properties (Hidden)
-        id_props = {'trace_id'}
+        id_props = {'trace','group_def'}
     end
 
     properties
@@ -17,7 +17,7 @@ classdef cursor_def < epworks.p.parse_object
         name
         placement
         style
-        trace_id
+        trace
         use_type
         visible_placement_only
     end
@@ -79,7 +79,7 @@ classdef cursor_def < epworks.p.parse_object
                     case 'Style'
                         obj.style = value;
                     case 'TraceID'
-                        obj.trace_id = value;
+                        obj.trace = value;
                     case 'UseType'
                         obj.use_type = value;
                     case 'VisiblePlacementOnly'
