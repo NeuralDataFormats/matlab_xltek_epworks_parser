@@ -7,6 +7,8 @@ classdef triggered_waveform < epworks.objects.result_object
     %   --------
     %   epworks.main
     %   epworks.objects.trace
+    %   epworks.objects.signal
+    %   epworks.objects.eeg_waveform
 
     properties (Hidden)
         id_props = {'parent','trace'}

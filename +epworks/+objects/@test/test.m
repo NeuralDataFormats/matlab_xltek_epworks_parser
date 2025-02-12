@@ -19,6 +19,8 @@ classdef test < epworks.objects.result_object
         stimbox_connected
         test_set_obj_count
         
+        %This may change ...
+        raw_settings
 
         %   points to study, NYI
         %parent
@@ -32,6 +34,8 @@ classdef test < epworks.objects.result_object
             obj.state = p.data.state;
             obj.stimbox_connected = p.data.stimbox_connected;
             obj.test_set_obj_count = p.data.test_set_obj_count;
+
+            obj.raw_settings = p.data.settings;
 
             %obj.parent = p.parent.id;
             obj.groups = {p.groups.id};
