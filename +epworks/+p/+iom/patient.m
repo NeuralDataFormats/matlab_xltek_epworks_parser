@@ -66,7 +66,7 @@ classdef patient < epworks.p.parse_object
                 end
             end
         end
-        function childrenToProps(obj)
+        function childrenToProps(obj,logger)
             class_names = cellfun(@epworks.utils.getShortClassName,obj.children,'un',0);
 
             mask = class_names == "study";

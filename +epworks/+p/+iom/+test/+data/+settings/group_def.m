@@ -4,7 +4,7 @@ classdef group_def < epworks.p.parse_object
     %   epworks.p.iom.test.data.settings.group_def
 
     properties (Hidden)
-        id_props = {'trigger_source','timeline_id','maacs_group_id'}
+        id_props = {'trigger_source','timeline','maacs_group'}
     end
 
     properties
@@ -22,7 +22,7 @@ classdef group_def < epworks.p.parse_object
         is_eeg_group
         limited_hb_decimation
         location
-        maacs_group_id
+        maacs_group
         name
         num_divisions_to_collect
         pre_trigger_dc_offset
@@ -33,7 +33,7 @@ classdef group_def < epworks.p.parse_object
         special_type
         start_on_test_activation
         sweeps_per_avg
-        timeline_id
+        timeline
         trigger_delay
         trigger_source
     end
@@ -105,7 +105,7 @@ classdef group_def < epworks.p.parse_object
                     case 'Location'
                         obj.location = value;
                     case 'MaacsGroupId'
-                        obj.maacs_group_id = value;
+                        obj.maacs_group = value;
                     case 'Name'
                         obj.name = value;
                     case 'NumDivisionsToCollect'
@@ -127,7 +127,7 @@ classdef group_def < epworks.p.parse_object
                     case 'SweepsPerAvg'
                         obj.sweeps_per_avg = value;
                     case 'TimelineID'
-                        obj.timeline_id = value;
+                        obj.timeline = value;
                     case 'TriggerDelay'
                         obj.trigger_delay = value;
                     case 'TriggerSource'

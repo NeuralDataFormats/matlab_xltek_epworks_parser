@@ -42,10 +42,10 @@ classdef parse_object < handle
                     linked_object = id_tracker.getObjectByID(id_value);
                     child_objects{i} = linked_object;
                 end
-                obj.children = child_objects; %#ok<MCNPN>
+                obj.children = child_objects; %#ok<MCNPR>
             end
         end
-        function childrenToProps(obj)
+        function childrenToProps(obj,logger)
             %Null to override
         end
     end

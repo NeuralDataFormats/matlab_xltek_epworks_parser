@@ -14,8 +14,10 @@ classdef logger < handle
         first_past_object_count = 0
         logging_index = 0
         logged_objects
+        time_offset
 
         id_tracker epworks.parse.id_tracker
+        id_tracker2 epworks.parse.id_tracker
 
         %NOT USED, for reference
         %TODO: Move to raw_object
@@ -34,6 +36,7 @@ classdef logger < handle
     methods
         function obj = logger()
             obj.id_tracker = epworks.parse.id_tracker;
+            obj.id_tracker2 = epworks.parse.id_tracker;
         end
         function initializeObjectHolder(obj)
             obj.logged_objects = cell(1,obj.first_past_object_count);
@@ -49,6 +52,9 @@ classdef logger < handle
         function logID(obj,obj_to_log,id)
             obj.id_tracker.logID(obj_to_log,id);
         end
+        function logUnknownID(obj,description,id)
+            obj.id_tracker2.logID(description,id);
+        end
         function doObjectLinking(obj)
             %
             %
@@ -62,6 +68,9 @@ classdef logger < handle
                 end
             end
         end
+        function out = getDescByUnknownID(obj,id)
+            out = obj.id_tracker2.getObjectByID(id);
+        end
         function out = getObjectByID(obj,id)
             out = obj.id_tracker.getObjectByID(id);
         end
@@ -69,7 +78,7 @@ classdef logger < handle
             for i = 1:length(obj.logged_objects)
                 cur_obj = obj.logged_objects{i};
                 if ~isempty(cur_obj)
-                    cur_obj.childrenToProps();
+                    cur_obj.childrenToProps(obj);
                 end
             end
         end

@@ -10,14 +10,15 @@ classdef data < epworks.p.parse_object
     %   
 
     properties (Hidden)
-        id_props = {'group_obj_id'}
+        id_props = {'group_obj'}
     end
 
     properties
         set_number
-        group_obj_id
+        group_obj
         is_active
         num_accepted
+        num_rejected
     end
 
     methods
@@ -32,11 +33,13 @@ classdef data < epworks.p.parse_object
                     case 'SetNumber'
                         obj.set_number = value;
                     case 'GroupObjId'
-                        obj.group_obj_id = value;
+                        obj.group_obj = value;
                     case 'IsActive'
                         obj.is_active = value;
                     case 'NumAccepted'
                         obj.num_accepted = value;
+                    case 'NumRejected'
+                        obj.num_rejected = value;
                     otherwise
                         keyboard
                 end

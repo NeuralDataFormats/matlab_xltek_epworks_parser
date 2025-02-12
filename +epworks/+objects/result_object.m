@@ -29,8 +29,18 @@ classdef result_object < handle
                     id_name = id_props{i};
                     id_value = obj.(id_name);
                     if ~isempty(id_value)
-                        linked_object = id_tracker.getObjectByID(id_value);
-                        obj.(id_name) = linked_object;
+                        if iscell(id_value)
+                            n_ids = length(id_value);
+                            objs = cell(1,n_ids);
+                            for j = 1:n_ids
+                                cur_id = id_value{j};
+                                objs{j} = id_tracker.getObjectByID(cur_id);
+                            end
+                            obj.(id_name) = [objs{:}];
+                        else
+                            linked_object = id_tracker.getObjectByID(id_value);
+                            obj.(id_name) = linked_object;
+                        end
                     end
                 end
             end

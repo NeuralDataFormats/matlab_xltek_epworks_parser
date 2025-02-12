@@ -3,16 +3,8 @@ classdef dat_entries < handle
     %   Class:
     %   epworks.parse.history.dat_entries
     
-    
-%     sdata   %[1 x n_segs], structure array
-%             mainID: [5372221655656442148 10840506685521778867] ??? What
-%                     are these? They might be useful in linking the .REC
-%                     ids to something else. These are trace IDs
-%                  n: 100
-%                IDs: [100x4 uint32]
-%                u32: [100x1 uint32] <- I'm not sure what this represents yet
-%         timestamps: [100x1 double]
-    
+    %   Seems to be linked to triggered_waveform and possibly other
+    %   collected signals (haven't checked)
 
     properties
        trace_id    %

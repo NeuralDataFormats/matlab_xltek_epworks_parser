@@ -9,7 +9,9 @@ classdef channel < epworks.p.parse_object
     end
 
     properties
+        %1 based
         chan_index
+        
         calibration
         chan_proc_type
         chan_type

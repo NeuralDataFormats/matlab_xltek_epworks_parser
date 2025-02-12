@@ -6,6 +6,8 @@ classdef data < epworks.p.parse_object
     properties
         acquisition_instrument
         acquisition_time_zone
+        %hours
+        time_offset
         comm_channel_handle
         creation_time
         creator
@@ -17,9 +19,15 @@ classdef data < epworks.p.parse_object
         iom_ui_version_low
         local_initialization_complete
         modification_time
+
+        %TODO: is object
         performed_procedures
         product_version_high
         product_version_low
+
+        %TODO: is object
+        remotes
+        request_update_initialization
     end
 
     methods
@@ -34,7 +42,15 @@ classdef data < epworks.p.parse_object
                     case 'AcquisitionInstrument'
                         obj.acquisition_instrument = value;
                     case 'AcquisitionTimeZone'
-                        obj.acquisition_time_zone = value;
+                        %Guessing that the first bit is 300 minutes diff
+                        %
+                        %   2 byte chars, not sure why the 
+                        %   truncation: 'Easter'
+                        %44     1     0     0    69     0    97     0   115     0   116     0   101     0   114     0
+                        obj.acquisition_time_zone = char(value(5:2:end));
+                        temp = -1*double(typecast(value(1:4),'uint32'))/60;
+                        obj.time_offset = hours(temp);
+                        r.time_offset;
                     case 'CommChannelHandle'
                         obj.comm_channel_handle = value;
                     case 'CreationTime'
@@ -55,14 +71,22 @@ classdef data < epworks.p.parse_object
                         obj.iom_ui_version_low = value;
                     case 'LocalInitializationComplete'
                         obj.local_initialization_complete = value;
+                        r.logUnknownID('study_data_LocalInitializationComplete',value);
                     case 'ModificationTime'
-                        obj.modification_time = value;
+                        obj.modification_time = epworks.utils.processType1time(value);
                     case 'PerformedProcedures'
+                        %TODO: This is an object
                         obj.performed_procedures = value;
                     case 'ProductVersionHigh'
                         obj.product_version_high = value;
                     case 'ProductVersionLow'
                         obj.product_version_low = value;
+                    case 'Remotes'
+                        %TODO: This is an object
+                        obj.remotes = value;
+                    case 'RequestUpdateInitialization'
+                        obj.request_update_initialization = value;
+                        r.logUnknownID('study_data_RequestUpdateInitialization',value);
                     otherwise
                         keyboard
                 end

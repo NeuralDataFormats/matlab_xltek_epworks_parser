@@ -90,7 +90,11 @@ classdef raw_object
                     end
                     guid_string = name(1:I);
                     name = name(I+1:end);
-                    name = epworks.utils.getSafeVariableName(name);
+                    if isempty(name)
+                        name = 'x_empty';
+                    else
+                        name = epworks.utils.getSafeVariableName(name);
+                    end
                     p.(name) = value;
                 elseif isstrprop(name(1),'digit')
                     if all(isstrprop(name,'digit'))

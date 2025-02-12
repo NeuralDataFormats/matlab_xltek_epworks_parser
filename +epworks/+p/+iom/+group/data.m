@@ -4,28 +4,28 @@ classdef data < epworks.p.parse_object
     %   epworks.p.eeg_waveform.data
 
     properties (Hidden)
-        id_props = {'baseline_set_id','preview_set_id','raw_sweep_set_id','test_obj_id'}
+        id_props = {'baseline_set','preview_set','raw_sweep_set','test_obj','group','trigger_source'}
     end
 
     properties
         name
 
-        baseline_set_id
+        baseline_set
         capture_enable
 
         %Threshold for capture, not whether to capture
         capture_threshold
         display_mode
-        group_id
+        enable
+        group
         is_eeg_group
-        
-        preview_set_id
-        raw_sweep_set_id
+        preview_set
+        raw_sweep_set
         rolling_window
         signal_type
         state
         sweeps_per_avg
-        test_obj_id
+        test_obj
         trigger_delay
         %type: ID
         trigger_source
@@ -40,36 +40,26 @@ classdef data < epworks.p.parse_object
                 cur_name = fn{i};
                 value = p.(cur_name);
                 switch cur_name
-                    %{
-                    case 'AudioVolume'
-                        obj.audio_volume = double(typecast(s2.raw_data,'uint32'));
-                    case 'Color'
-                        obj.color = double(s2.raw_data);
-                    case 'HffCutoff'
-                        obj.hff_cutoff = typecast(s2.raw_data,'double');
-                    case 'IsAlarmedWave'
-                        obj.is_alarmed_wave = double(typecast(s2.raw_data,'uint32'));
-                    %}
-
-
                     case 'BaselineSetId'
-                        obj.baseline_set_id = value;
+                        obj.baseline_set = value;
                     case 'CaptureEnable'
                         obj.capture_enable = value;
                     case 'CaptureThreshold'
                         obj.capture_threshold = value;
                     case 'DisplayMode'
                         obj.display_mode = value;
+                    case 'Enable'
+                        obj.enable = value;
                     case 'GroupId'
-                        obj.group_id = value;
+                        obj.group = value;
                     case 'IsEegGroup'
                         obj.is_eeg_group = value;
                     case 'Name'
                         obj.name = value;
                     case 'PreviewSetId'
-                        obj.preview_set_id = value;
+                        obj.preview_set = value;
                     case 'RawSweepSetId'
-                        obj.raw_sweep_set_id = value;
+                        obj.raw_sweep_set = value;
                     case 'RollingWindow'
                         obj.rolling_window = value;
                     case 'SignalType'
@@ -79,7 +69,7 @@ classdef data < epworks.p.parse_object
                     case 'SweepsPerAvg'
                         obj.sweeps_per_avg = value;
                     case 'TestObjId'
-                        obj.test_obj_id = value;
+                        obj.test_obj = value;
                     case 'TriggerDelay'
                         obj.trigger_delay = value;
                     case 'TriggerSource'

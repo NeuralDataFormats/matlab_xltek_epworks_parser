@@ -16,6 +16,7 @@ classdef trace < epworks.p.parse_object
         children
         groups
         eeg_waveforms
+        triggered_waveforms
 
         rec_data
         history
@@ -69,7 +70,7 @@ classdef trace < epworks.p.parse_object
                 end
             end
         end
-    function childrenToProps(obj)
+        function childrenToProps(obj,logger)
             if ~isempty(obj.children)
                 class_names = cellfun(@epworks.utils.getShortClassName,obj.children,'un',0);
                 mask = class_names == "group";
@@ -77,6 +78,9 @@ classdef trace < epworks.p.parse_object
                 
                 mask = class_names == "eeg_waveform";
                 obj.eeg_waveforms = [obj.children{mask}];
+
+                mask = class_names == "triggered_waveform";
+                obj.triggered_waveforms = [obj.children{mask}];
             end
         end
     end
