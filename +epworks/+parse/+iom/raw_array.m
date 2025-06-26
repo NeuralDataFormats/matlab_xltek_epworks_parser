@@ -24,7 +24,7 @@ classdef raw_array
         end
         function out = getStruct(obj)
             %
-            %   really getArray, but I didn't put swtich
+            %   really getArray, but I didn't put switch
             %   case in epworks.parse.iom.raw_object
             if obj.n_entries == 0
                 out = [];

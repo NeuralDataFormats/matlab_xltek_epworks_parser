@@ -20,22 +20,31 @@ classdef data < epworks.p.parse_object
         baseline
         clone
         color
+        explicit_save
         hff_cutoff
+        iom_local_object
         is_alarmed_wave
         is_captured
+        is_for_review
+        is_from_history
+        is_grabbed
+        is_rejected_data
         left_display_gain
         lff_cutoff
         me_clone
         notch_cutoff
+        num_notes
         original_decim
         original_samp_freq
         range
+        raw_sweep_number
         resolution
         right_display_gain
         samp_freq
         saved_stim_intensity
         sequence_number
         set_obj
+        smooth_sel
         source_data
         timebase
         timestamp
@@ -44,6 +53,7 @@ classdef data < epworks.p.parse_object
         trigger_delay
         ui_settings
         visible
+        visibility
         was_baseline
     end
 
@@ -68,12 +78,24 @@ classdef data < epworks.p.parse_object
                         obj.clone = value;
                     case 'Color'             
                         obj.color = epworks.utils.getColor(value);
+                    case 'ExplicitSave'
+                        obj.explicit_save = value;
                     case 'HffCutoff'      
                         obj.hff_cutoff = value;
+                    case 'IOMLocalObject'
+                        obj.iom_local_object = value;
                     case 'IsAlarmedWave'     
                         obj.is_alarmed_wave = value;
                     case 'IsCaptured'
                         obj.is_captured = value;
+                    case 'IsForReview'
+                        obj.is_for_review = value;
+                    case 'IsFromHistory'
+                        obj.is_from_history = value;
+                    case 'IsGrabbed'
+                        obj.is_grabbed = value;
+                    case 'IsRejectedData'
+                        obj.is_rejected_data = value;
                     case 'LeftDisplayGain'   
                         obj.left_display_gain = value;
                     case 'LffCutoff'         
@@ -82,12 +104,16 @@ classdef data < epworks.p.parse_object
                         obj.me_clone = value;
                     case 'NotchCutoff'       
                         obj.notch_cutoff = value;
+                    case 'NumNotes'
+                        obj.num_notes = value;
                     case 'OriginalDecim'     
                         obj.original_decim = value;
                     case 'OriginalSampFreq'  
                         obj.original_samp_freq = value;
                     case 'Range'             
                         obj.range = value;
+                    case 'RawSweepNum'
+                        obj.raw_sweep_number = value;
                     case 'Resolution'      
                         obj.resolution = value;
                     case 'RightDisplayGain'  
@@ -100,13 +126,17 @@ classdef data < epworks.p.parse_object
                         obj.sequence_number = value;
                     case 'SetObjId'          
                         obj.set_obj = value;
+                    case 'SmoothSel'
+                        obj.smooth_sel = value;
                     case 'SourceData'       
                         obj.source_data = value;
                     case 'Timebase'          
                         obj.timebase = value;
                     case 'Timestamp'         
                         obj.timestamp = epworks.utils.processType3time(value(1:8));
-                        obj.timestamp_part2 = double(typecast(value(9:16),'int32'));
+                        if length(value) > 8
+                            obj.timestamp_part2 = double(typecast(value(9:16),'int32'));
+                        end
                     case 'TraceObjId'        
                         obj.trace_obj = value;
                     case 'TriggerDelay'      
@@ -115,6 +145,8 @@ classdef data < epworks.p.parse_object
                         obj.ui_settings = value;
                     case 'Visible'           
                         obj.visible = value;
+                    case 'Visibility'
+                        obj.visibility = value;
                     case 'WasBaseline'
                         obj.was_baseline = value;
                     otherwise

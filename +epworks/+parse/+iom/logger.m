@@ -3,8 +3,8 @@ classdef logger < handle
     %   Class:
     %   epworks.parse.iom.logger
     %
-    %   This gets passed to object construction
-    %   both in the initial parse and the population of MATLAB objects.
+    %   This gets passed to object construction both in the initial parse 
+    %   and the population of MATLAB objects.
     %
     %   It makes it easier to do logging and to iterate over objects
     %
@@ -16,7 +16,10 @@ classdef logger < handle
         logged_objects
         time_offset
 
+        %This one is for parsing
         id_tracker epworks.parse.id_tracker
+
+        %This one is for the final object construction
         id_tracker2 epworks.parse.id_tracker
 
         %NOT USED, for reference
@@ -27,7 +30,7 @@ classdef logger < handle
         % 0 : 4 bytes, format varies
         % 1 : double
         % 2 : string
-        % 3 : 16 bytes, IDs or times
+        % 3 : 16 bytes (not always), IDs or times
         % 4 : array?
         % 5 : object
         % 6 : GUIds???

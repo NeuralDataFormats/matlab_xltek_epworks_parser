@@ -3,6 +3,8 @@ classdef history_dat_parser < handle
     %   Class:
     %   epworks.parse.history_dat_parser
     %
+    %   ??? What is this?
+    %
     %
     %   Improvements:
     %   -------------------------------------------------------------------
@@ -15,7 +17,6 @@ classdef history_dat_parser < handle
         first_ID
         first_unknown   %I've only ever observed a value of 2
         file_timestamp  %matlab time converted to seconds
-        file_timestamp_string %datestr of time
         n_entries
         
         d2 = '-----  Parsed Entries  ------'

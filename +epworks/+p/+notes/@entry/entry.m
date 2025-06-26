@@ -1,7 +1,7 @@
 classdef entry < epworks.RNEL.handle_light
     %
-    %   CLASS:
-    %       epworks.notes.entry
+    %   Class:
+    %   epworks.p.notes.entry
     %
     %   See Also:
     %   epworks.notes
@@ -23,6 +23,9 @@ classdef entry < epworks.RNEL.handle_light
        %
        %    Two categories observed, generic and impedance testing
        type 
+
+       %    for generic, you can have waveform links
+       %    for impedance, you can get values
     end
     
     methods

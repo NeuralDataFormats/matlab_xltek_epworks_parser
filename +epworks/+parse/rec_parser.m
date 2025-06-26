@@ -12,6 +12,8 @@ classdef rec_parser < handle
     %   See Also
     %   --------
     %   epworks.parse.main
+    %   epworks.p.rec.waveform
+    %   
 
     
     properties
@@ -35,8 +37,11 @@ classdef rec_parser < handle
         %   Even in other studies this seems to be the same.
         
         
-        %I think this means 2 IDS
+        %I think this means 2 IDs
         first_unknown   %A value of 2 has always been observed 
+        %   2 IDs being:
+        %   1) trace ID
+        %   2) ochan ID
 
         file_timestamp  %matlab time converted to seconds
         default_length %Length of each section of data
@@ -48,12 +53,10 @@ classdef rec_parser < handle
         trace
         ochan
         fs
-        %all_first_100
-
     end
 
     methods
-        function obj = rec_parser(file_path,logger)
+        function obj = rec_parser(file_path,logger,tz_offset)
             
             INTRO_BYTE_LENGTH = 96;
 
@@ -93,8 +96,8 @@ classdef rec_parser < handle
             %    - 21:28
             %    - 'file_timestamp'
             %4) 32 bytes - two IDs?
-            %    - 29:44
-            %    - 45:60
+            %    - 29:44 - trace_ID
+            %    - 45:60 - ochan_ID
             %5) default length?
             %    - 61:64
             %6) padded zeros
@@ -114,6 +117,7 @@ classdef rec_parser < handle
             end
 
             obj.file_timestamp = epworks.utils.processType3time(intro(21:28));
+            obj.file_timestamp = obj.file_timestamp + tz_offset;
                         
             other_IDs = reshape(intro(29:60),16,2)';
             
@@ -123,9 +127,18 @@ classdef rec_parser < handle
             obj.ochan = logger.getObjectByID(ochan_ID);
 
             %Link this object from the trace
-            obj.trace.rec_data = obj;
+            if ~isempty(obj.trace)
 
-            obj.name = obj.trace.name;
+                %TODO: We should probably make this more explicit
+                obj.trace.rec_data = [obj.trace.rec_data {obj}];
+    
+                obj.name = obj.trace.name;
+            else
+                error('Need to verify this only occurs for empty')
+                obj.name = obj.ochan.name;
+
+                %Does this mean we have no data?
+            end
             
             obj.default_length = double(typecast(intro(61:64),'uint32'));
             
@@ -136,13 +149,31 @@ classdef rec_parser < handle
             %Note, this assumes eeg_waveforms
             %
             %   TODO: Determine type automatically
-            if ~isempty(obj.trace.eeg_waveforms)
-                info = obj.trace.eeg_waveforms(1).data;
-            else
-                info = obj.trace.triggered_waveforms(1).data;
-            end
+            %
+            %   UNKNOWN: When there is no trace object, what is actually
+            %   being logged here? The code seems to work (no errors) but
+            %   not sure if there is a larger parsing issue.
+            if ~isempty(obj.trace) && ~isempty(obj.trace.children)
 
-            obj.fs = info.samp_freq/info.timebase;
+                %JAH: 6/24/2025 - If we have no children it is possible we could get
+                %the type some other way but for now we'll set fs to NaN
+                if ~isempty(obj.trace.eeg_waveforms)
+                    info = obj.trace.eeg_waveforms(1).data;
+                else
+                    info = obj.trace.triggered_waveforms(1).data;
+                end
+    
+                %JAH: 6/24/2025 - why is this not just samp_freq?
+                %       - should describe file where I found this to be
+                %       true
+                obj.fs = info.samp_freq/info.timebase;
+                %obj.fs = info.samp_freq;
+            else
+                %JAH: 6/24/2025 - this may not be correct ...
+                temp = obj.ochan.to;
+                obj.fs = temp.sampling_freq/obj.ochan.timebase;
+                %obj.fs = temp.sampling_freq;
+            end
             
             %Data Processing
             %---------------------------------------------------------------            
@@ -165,8 +196,13 @@ classdef rec_parser < handle
 
             entries = cell(1,n_waveforms);
             for i = 1:n_waveforms
-                entries{i} = epworks.p.rec.waveform(i,data_matrix(:,i),...
-                    obj.default_length,obj.trace,obj.ochan,obj.fs);
+                temp = epworks.p.rec.waveform(i,data_matrix(:,i),...
+                    obj.default_length,obj.trace,obj.ochan,obj.fs,tz_offset);
+                entries{i} = temp;
+                %These IDs match the parsed objects
+                %In particular, the first one I saw matched:
+                %   epworks.p.iom.triggered_waveform
+                %logger.logID(entries{i},temp.id);
             end
 
             obj.waveforms = [entries{:}];
@@ -174,10 +210,23 @@ classdef rec_parser < handle
             %obj.all_first_100 = vertcat(obj.waveforms.first_100);
 
 
-
+            %UNKNOWN: Can we tell types
+            %
+            %   I think at this point we could if we passed in the IOM
+            %   parsing which happens before this.
+            %
+            %   Although I'm not sure how to get the parent object for
+            %   each waveform. I guess that is in trace and ochan
+            %   properties.
+            %
+            %
             %TODO: We could probably omit this for triggered waveforms
             %
             %   This IS needed for eeg_waveforms
+            %
+            %   Note, this is an attempt to stich multiple waveforms
+            %   together into one waveform based on the gap in time between
+            %   the end of one set of data and the start of the next
             CUTOFF_RATIO = 1;
             dt = 1/obj.fs;
             is_start = false(1,n_waveforms);

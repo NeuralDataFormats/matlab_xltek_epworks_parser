@@ -7,7 +7,16 @@ classdef data < epworks.p.parse_object
         baseline_set_id
         capture_enable
 
+        
         creation_time
+
+        iom32_noise_spectrum_base_frequency
+        %This is probably wrong and should be typecasted
+        warn = 'These next two properties are probably interpreted wrong currently'
+        iom32_noise_spectrum_bins
+        %This is probably wrong
+        iom32_noise_spectrum_number_of_bins
+        iom32_stim_reset_required
         settings
         simulation_mode
         state
@@ -30,6 +39,14 @@ classdef data < epworks.p.parse_object
                 switch cur_name
                     case 'CreationTime'
                         obj.creation_time = epworks.utils.processType1time(value);
+                    case 'IOM32NoiseSpectrumBaseFrequency'
+                        obj.iom32_noise_spectrum_base_frequency = value;
+                    case 'IOM32NoiseSpectrumBins'
+                        obj.iom32_noise_spectrum_bins = value;
+                    case 'IOM32NoiseSpectrumNumberOfBins'
+                        obj.iom32_noise_spectrum_number_of_bins = value;
+                    case 'IOM32StimResetRequired'
+                        obj.iom32_stim_reset_required = value;
                     case 'Settings'
                         obj.settings = epworks.p.iom.test.data.settings(value,r);
                     case 'SimulationMode'

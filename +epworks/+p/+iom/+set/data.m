@@ -16,7 +16,9 @@ classdef data < epworks.p.parse_object
     properties
         set_number
         group_obj
+        iom_local_object
         is_active
+        is_from_history
         num_accepted
         num_rejected
     end
@@ -34,8 +36,12 @@ classdef data < epworks.p.parse_object
                         obj.set_number = value;
                     case 'GroupObjId'
                         obj.group_obj = value;
+                    case 'IOMLocalObject'
+                        obj.iom_local_object = value;
                     case 'IsActive'
                         obj.is_active = value;
+                    case 'IsFromHistory'
+                        obj.is_from_history = value;
                     case 'NumAccepted'
                         obj.num_accepted = value;
                     case 'NumRejected'

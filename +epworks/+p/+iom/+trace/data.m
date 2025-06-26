@@ -14,20 +14,23 @@ classdef data < epworks.p.parse_object
     properties
         name
         create_time
-        create_time_part2
+        %create_time_part2
         active_waveform_obj
         test_obj
         group_obj
         max_num_historical_trigs
         o_chan
-        origin_x
-        origin_y
+        origin_x = NaN
+        origin_y = NaN
         private_request
         last_recorded_set_number
         random_guid
+        raw_sweeps_mode
         rejection_originator
         %Some enumeration
         state
+        st_live_num_accepted
+        st_live_timestamp
     end
 
     methods
@@ -44,7 +47,9 @@ classdef data < epworks.p.parse_object
                         obj.active_waveform_obj = value;
                     case 'CreateTime'
                         obj.create_time = epworks.utils.processType3time(value(1:8));
-                        obj.create_time_part2 = double(typecast(value(9:16),'int32'));
+                        if length(value) > 8
+                            obj.create_time_part2 = double(typecast(value(9:16),'int32'));
+                        end
                     case 'GroupObjId'
                         obj.group_obj = value;
                     case 'MaxNumHistoricalTriggs'
@@ -63,10 +68,16 @@ classdef data < epworks.p.parse_object
                     case 'RandomGUID'
                         %Do we link this to anything?
                         obj.random_guid = value;
+                    case 'RawSweepsMode'
+                        obj.raw_sweeps_mode = value;
                     case 'RejectionOriginator'
                         obj.rejection_originator = value;
                     case 'State'
                         obj.state = value;
+                    case 'STLiveNumAccepted'
+                        obj.st_live_num_accepted = value;
+                    case 'STLiveTimestamp'
+                        obj.st_live_timestamp = value;
                     case 'TestObjId'
                         obj.test_obj = value;
                     case 'LastRecordedSetNumber'

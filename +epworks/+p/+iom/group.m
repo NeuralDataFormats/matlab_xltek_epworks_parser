@@ -5,6 +5,7 @@ classdef group < epworks.p.parse_object
     %
     %   See Also
     %   --------
+    %   epworks.p.iom.group.data
     %   epworks.p.study
     %   epworks.p.test
     %   epworks.p.group
@@ -28,9 +29,10 @@ classdef group < epworks.p.parse_object
         children
 
         sets
+
         traces
 
-        data
+        data epworks.p.iom.group.data
 
         id
 

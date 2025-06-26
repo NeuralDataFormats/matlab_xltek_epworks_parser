@@ -8,7 +8,11 @@ classdef file_manager < handle
     %   Structure
     %   ---------
     %   iom - config info
-    %   
+    %   REC - where the waveform data exist   
+    %
+    %   See Also
+    %   --------
+    %   epworks.parse.main
     
     properties
         study_name
@@ -24,6 +28,7 @@ classdef file_manager < handle
         tst_file_paths   %
         tst_folder_names %
         rec_file_paths   %{1 x n_tst}{1 x n_rec}
+        spt_file_paths
     end
     
     methods
@@ -122,12 +127,17 @@ classdef file_manager < handle
             
             tst_file_paths_local = cell(1,n_tst);
             rec_file_paths_local = cell(1,n_tst);
+            spt_file_paths_local = cell(1,n_tst);
             
             for iTST = 1:n_tst
                 cur_tst_base_path = fullfile(history_base_path,tst_folder_names_local{iTST});
                 
                 tst_file_struct = dir(fullfile(cur_tst_base_path,'*.TST'));
                 if isempty(tst_file_struct)
+                    rec_file_struct = dir(fullfile(cur_tst_base_path,'*.REC'));
+                    if ~isempty(rec_file_struct)
+                        error('Assumption violated, fix code')
+                    end
                     continue
                 elseif length(tst_file_struct) ~= 1
                     error('Unhandled case')
@@ -135,17 +145,21 @@ classdef file_manager < handle
                     tst_file_paths_local{iTST} = fullfile(cur_tst_base_path,tst_file_struct.name);
                 end
                 
-                %ASSUMPTION: If there are no tst files, there are no rec files
-                
                 rec_file_struct = dir(fullfile(cur_tst_base_path,'*.REC'));
                 if ~isempty(rec_file_struct)
                     rec_file_paths_local{iTST} = epworks.sl.dir.fullfileCA(cur_tst_base_path,{rec_file_struct.name});
+                end
+
+                spt_file_struct = dir(fullfile(cur_tst_base_path,'*.SPT'));
+                if ~isempty(spt_file_struct)
+                    spt_file_paths_local{iTST} = epworks.sl.dir.fullfileCA(cur_tst_base_path,{spt_file_struct.name});
                 end
             end
             
             obj.tst_file_paths = tst_file_paths_local;
             obj.tst_folder_names = tst_folder_names_local;
             obj.rec_file_paths = rec_file_paths_local;
+            obj.spt_file_paths = spt_file_paths_local;
             
         end
     end

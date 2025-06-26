@@ -39,7 +39,7 @@ classdef waveform < epworks.p.parse_object
     end
 
     methods
-        function obj = waveform(i,data,default_length,trace,ochan,fs)
+        function obj = waveform(i,data,default_length,trace,ochan,fs,tz_offset)
             obj.fs = fs;
 
             bytes = data';
@@ -86,6 +86,7 @@ classdef waveform < epworks.p.parse_object
             end
             obj.id = bytes(5:20);
             obj.timestamp = epworks.utils.processType3time(bytes(21:28));
+            obj.timestamp = obj.timestamp + tz_offset;
 
 
             obj.stim_amp = double(typecast(bytes(57:60),'single'));

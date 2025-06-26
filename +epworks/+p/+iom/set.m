@@ -55,6 +55,8 @@ classdef set < epworks.p.parse_object
                 end
             end
 
+            obj.n_children = length(obj.children);
+
 
         end
     end

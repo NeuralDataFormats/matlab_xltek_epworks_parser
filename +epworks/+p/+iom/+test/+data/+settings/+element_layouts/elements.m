@@ -2,6 +2,10 @@ classdef elements < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.test.data.settings.element_layouts.elements
+    %
+    %   See Also
+    %   --------
+    %   epworks.p.test.data.settings.element_layouts.elements.waveform_view
 
     properties
         dsa_spectral_eeg_view
@@ -12,16 +16,10 @@ classdef elements < epworks.p.parse_object
         stim_ctrl_view
         tp_density_spectral_eeg_view
         test_dir_view
-        waveform_view
-        waveform_view1
-        waveform_view2
-        waveform_view3
-        waveform_view4
-        waveform_view5
-        waveform_view6
-        waveform_view7
-        waveform_view8
-        waveform_view9
+
+        %This is an array ...
+        waveform_views
+
     end
 
     methods
@@ -29,6 +27,11 @@ classdef elements < epworks.p.parse_object
             r.logObject(obj);
             p = s.props;
             fn = fieldnames(p);
+
+            temp = regexp(fn,'^WaveformView_\d','once');
+            n_views = sum(~cellfun('isempty',temp))+1;
+            views = cell(1,n_views);
+
             for i = 1:length(fn)
                 cur_name = fn{i};
                 value = p.(cur_name);
@@ -49,30 +52,26 @@ classdef elements < epworks.p.parse_object
                         obj.tp_density_spectral_eeg_view = epworks.p.iom.test.data.settings.element_layouts.elements.tp_density_spectral_eeg_view(value,r);
                     case 'TestDirView'
                         obj.test_dir_view = epworks.p.iom.test.data.settings.element_layouts.elements.test_dir_view(value,r);
-                    case 'WaveformView'
-                        obj.waveform_view = epworks.p.iom.test.data.settings.element_layouts.elements.waveform_view(value,r);
-                    case 'WaveformView_1'
-                        obj.waveform_view1 = epworks.p.iom.test.data.settings.element_layouts.elements.waveform_view(value,r);
-                    case 'WaveformView_2'
-                        obj.waveform_view2 = epworks.p.iom.test.data.settings.element_layouts.elements.waveform_view(value,r);
-                    case 'WaveformView_3'
-                        obj.waveform_view3 = epworks.p.iom.test.data.settings.element_layouts.elements.waveform_view(value,r);
-                    case 'WaveformView_4'
-                        obj.waveform_view4 = epworks.p.iom.test.data.settings.element_layouts.elements.waveform_view(value,r);
-                    case 'WaveformView_5'
-                        obj.waveform_view5 = epworks.p.iom.test.data.settings.element_layouts.elements.waveform_view(value,r);
-                    case 'WaveformView_6'
-                        obj.waveform_view6 = epworks.p.iom.test.data.settings.element_layouts.elements.waveform_view(value,r);
-                    case 'WaveformView_7'
-                        obj.waveform_view7 = epworks.p.iom.test.data.settings.element_layouts.elements.waveform_view(value,r);
-                    case 'WaveformView_8'
-                        obj.waveform_view8 = epworks.p.iom.test.data.settings.element_layouts.elements.waveform_view(value,r);
-                    case 'WaveformView_9'
-                        obj.waveform_view9 = epworks.p.iom.test.data.settings.element_layouts.elements.waveform_view(value,r);
                     otherwise
-                        keyboard
+                        cur_name = string(cur_name);
+                        if startsWith(cur_name,'WaveformView')
+                            temp = regexp(cur_name,'\d+','once','match');
+                            if isempty(temp) || ismissing(temp)
+                                %0 doesn't have a number
+                                index = 1;
+                            else
+                                %Note, they start at 0
+                                index = str2double(temp) + 1;
+                            end
+                            view = epworks.p.iom.test.data.settings.element_layouts.elements.waveform_view(value,r);
+                            views{index} = view;
+                        else
+                            keyboard
+                        end
+                        
                 end
             end
+            obj.waveform_views = [views{:}];
             
         end
     end

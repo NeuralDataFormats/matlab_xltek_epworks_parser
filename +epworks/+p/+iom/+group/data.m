@@ -16,15 +16,15 @@ classdef data < epworks.p.parse_object
         %Threshold for capture, not whether to capture
         capture_threshold
         display_mode
-        enable
+        enable = -1
         group
-        is_eeg_group
+        is_eeg_group = 0
         preview_set
         raw_sweep_set
         rolling_window
-        signal_type
-        state
-        sweeps_per_avg
+        signal_type = -1
+        state = -1
+        sweeps_per_avg = -1
         test_obj
         trigger_delay
         %type: ID
