@@ -32,23 +32,24 @@ classdef file_manager < handle
     end
     
     methods
-        function obj = file_manager(study_name_or_path)
+        function obj = file_manager(study_path_or_iom_path)
             %
             %
-            %   obj = file_manager(*study_name_or_path)
+            %   obj = file_manager(*study_path)
+            %   obj = file_manager(*iom_path)
             %
-            %   study_name : must match the folder name that you wish to
-            %   read in the base study folder
+            %   Inputs
+            %   ------
+            %   iom_path : 
+            %       Path to the .iom file
+            %   study_path :
+            %       Path to the study folder (which holds the iom file)
             %
-            %   base_study_folder/[study_name]/something.iom
-            %
-            %   OR
-            %
-            %   study_path = 'C:/path/to/my_study/ which contains a .iom
-            %   file
-            %
+            if isstring(study_path_or_iom_path)
+                study_path_or_iom_path = char(study_path_or_iom_path);
+            end
             
-            if ~exist('study_name_or_path','var') || isempty(study_name_or_path)
+            if ~exist('study_path_or_iom_path','var') || isempty(study_path_or_iom_path)
                 [iom_file_name, base_path] = uigetfile( ...
                     {'*.iom', 'InterOperative Mon. (*.iom)'},'Please select an IOM file');
                 if iom_file_name == 0
@@ -56,19 +57,19 @@ classdef file_manager < handle
                    error('User canceled') 
                 end
             else
-                [base_path,iom_file_name,ext] = fileparts(study_name_or_path);
+                [base_path,iom_file_name,ext] = fileparts(study_path_or_iom_path);
                 if strcmp(ext,'.iom')
                     iom_file_name = [iom_file_name '.iom'];
                     %all done
                     
-                elseif exist(study_name_or_path,'dir')
-                    base_path = study_name_or_path;
+                elseif exist(study_path_or_iom_path,'dir')
+                    base_path = study_path_or_iom_path;
                     %We expect a single data (*.iom file)
                     iom_file_name = '';
                     %---------------------------------------------------------------
                 else
                     %Input is thought to be a name, not a folder
-                    study_name_local = study_name_or_path;
+                    study_name_local = study_path_or_iom_path;
 
                     %Get the base path from the user_options
                     user_options_obj = epworks.user_options.getInstance;

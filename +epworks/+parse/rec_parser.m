@@ -53,6 +53,7 @@ classdef rec_parser < handle
         trace
         ochan
         fs
+        is_trace_orphan = false
     end
 
     methods
@@ -130,12 +131,17 @@ classdef rec_parser < handle
             if ~isempty(obj.trace)
 
                 %TODO: We should probably make this more explicit
+                %
+                %   When building traces, go through and find
+                %   relevant rec files
                 obj.trace.rec_data = [obj.trace.rec_data {obj}];
     
                 obj.name = obj.trace.name;
             else
-                error('Need to verify this only occurs for empty')
+                %error('Need to verify this only occurs for empty')
+                %otherwise we're losing data
                 obj.name = obj.ochan.name;
+                obj.is_trace_orphan = true;
 
                 %Does this mean we have no data?
             end
@@ -170,6 +176,8 @@ classdef rec_parser < handle
                 %obj.fs = info.samp_freq;
             else
                 %JAH: 6/24/2025 - this may not be correct ...
+
+
                 temp = obj.ochan.to;
                 obj.fs = temp.sampling_freq/obj.ochan.timebase;
                 %obj.fs = temp.sampling_freq;

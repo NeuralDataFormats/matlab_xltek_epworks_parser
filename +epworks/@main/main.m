@@ -18,51 +18,83 @@ classdef main < epworks.RNEL.handle_light
     %             eeg_waveform
     %             triggered_waveform
     %             freerun_waveform
+    %
+    %
+    %   Settings
+    %   --------
+    %   test.data.settings
+    %       .o_chans
+    %       .i_chans
+    %       .group_def
+    %       .electrodes
+    %       .cursor_calc
+    %       .cursor_def
+    %       .timelines       
+    %
+    %   group_def
+    %       .timeline
+    %       .trigger_source
+    %
+    %   ochan
+    %       .group_def
+    %       .to (i_chans)
+    %
+    %   ichan
+    %       .active_electrode
+    %       .ref_electrode
+    %
+    %   Unhandled and Unknowns
+    %   ----------------------
+    %   1. Lots of small unknowns. Tried to start using "UNKNOWN" to
+    %   indicate this.
+    %   2. The TST files seem to be redundant with the IOM file. They 
+    %   may actually be the settings at the time of the data creation.
+    %   This may be more accurate but for now sorting this out is low
+    %   priority.
+    %   3. I started to parse the SPT files but they didn't look
+    %   interesting (could be wrong).
+    %   4. Trending.DAT is not processed.
+    %   5. Some REC files do not have traces. Not sure what to do with
+    %   those files. The parser class indicates if this happened and 
+    %   which REC files this applies to.
+    %   6. There are some redundant IDs with cursor_calc and cursor_def.
+    %   It is not clear why the ID is showing more than once.
 
-    %   Questions
-    %   ---------
-    %   1) Lots of unknowns with the rec parser (in particular fs, see
-    %   file)
-    %   2) Where is the local offset time stored?
+    properties (Hidden)
+        s %This is a structure that holds all of the top level parsed
+        %objects.
+    end
 
     properties
         
         p %Parsed information epworks.parse.main
 
-        s %This is a structure that holds all of the top level parsed
-        %objects.
-
+        info
         traces
         groups
-        group_info
         sets
         tests
         studies
         eeg_waveforms
-        eeg_waveforms_info
-        
         triggered_waveforms
-        triggered_info
-
         freerun_waveforms
-        freerun_info
 
         notes
 
         %Not yet exposed - these are parsed
-
-        %patien
-        %study
+        % - patient
+        %
+        % - cursors - I found one file where the IDs were not unique
     end
     
     methods
-        function obj = main(study_name_or_path)
+        function obj = main(study_path_or_iom_path)
             
             if nargin == 0
-                study_name_or_path = '';
+                study_path_or_iom_path = '';
             end
 
-            obj.p = epworks.parse.main(study_name_or_path);
+            obj.p = epworks.parse.main(study_path_or_iom_path);
             obj.s = obj.p.iom.s2;
             
             %I don't like where this object lives but I think
@@ -72,7 +104,8 @@ classdef main < epworks.RNEL.handle_light
             logger.first_past_object_count = 1e5;
             logger.initializeObjectHolder();
 
-
+            %History processing
+            %-----------------------------------------------------------
             % % % % keyboard
             % % % % %Not finding anything in the history, why?
             % % % % n_entries = obj.p.history.n_entries;
@@ -120,23 +153,6 @@ classdef main < epworks.RNEL.handle_light
             end
             obj.groups = [temp_objs{:}];
 
-            %TODO: Move this as method to group class
-            index = (1:n_groups)';
-            name = string({obj.groups.name}');
-            is_eeg_group = [obj.groups.is_eeg_group]';
-            state = [obj.groups.state]';
-            signal_type = [obj.groups.signal_type]';
-            sweeps_per_avg = [obj.groups.sweeps_per_avg]';
-            trigger_delay = [obj.groups.trigger_delay]';
-            n_sets = zeros(n_groups,1);
-            n_traces = zeros(n_groups,1);
-            for i = 1:n_groups
-                n_sets(i) = length(obj.groups(i).sets);
-                n_traces(i) = length(obj.groups(i).traces);
-            end
-
-            obj.group_info = table(index,name,n_sets,n_traces,is_eeg_group,state,signal_type,sweeps_per_avg,trigger_delay);
-
             %Set creation
             %--------------------------------------------------------------
             p_obj = obj.s.set;
@@ -174,11 +190,6 @@ classdef main < epworks.RNEL.handle_light
             end
             obj.triggered_waveforms = [temp_objs{:}];
 
-           
-
-
-            
-
             %Freerun Waveform creation
             %--------------------------------------------------------------
             p_obj = obj.s.freerun_waveform;
@@ -187,10 +198,19 @@ classdef main < epworks.RNEL.handle_light
                 temp_objs{i} = epworks.objects.freerun_waveform(obj.p,p_obj(i),logger);
             end
             obj.freerun_waveforms = [temp_objs{:}];
-            
 
             %ID to object translation
             %--------------------------------------------------------------
+            %  
+            %   We want properties to point to "clean" objects, not the 
+            %   parsed objects which are a bit more messy/raw. So on
+            %   creation we populate IDs, instead of objects (as the 
+            %   only objects we may have at the time are parsed), and
+            %   then we go back after everything has been created 
+            %   and replace the IDs with the more clean/finalized
+            %   objects.
+            %
+            %   That's what we're doing here.
             logger.doObjectLinking();
 
             %After linking processing
@@ -200,9 +220,6 @@ classdef main < epworks.RNEL.handle_light
             obj.groups.processPostLinking(obj.tests(1));
             
             obj.traces.processPostLinking();
-
-
-            %Getting info ....
 
             %This needs to be done after linking since the linking
             %trades the ID for the created object
@@ -222,36 +239,14 @@ classdef main < epworks.RNEL.handle_light
                 w.data = w.trace.data;
             end
 
-            s = obj.triggered_waveforms;    
-
-            keyboard
-
+            %Some additional info population
+            %
+            %   Note, if we rearrange things we should update this as
+            %   the tables show index order.
+            obj.info = epworks.main.table_info(obj);
 
             obj.notes = epworks.objects.notes(obj.p,obj.studies);
 
-
-            %Old code at this point ...
-            %--------------------------------------------------------------
-            
-            
-            
-            %tst files
-            %---------------------------------------------------------------
-            %This looks redundant with the iom file ...
-% % % %             tst_file_paths = file_manager.tst_file_paths;
-% % % %             n_tst = length(tst_file_paths);
-% % % %             
-% % % %             tst_all = cell(1,n_tst);
-% % % %             for iTST = 1:n_tst
-% % % %                 tst_all{iTST} = epworks.tst_parser(tst_file_paths{iTST});
-% % % %             end
-% % % %             
-% % % %             tst = [tst_all{:}];
-% % % %             a = [tst.all_objects_out];
-% % % %             
-% % % %             all_full_names = [a.full_name]';
-% % % %             u_full = unique(all_full_names);
-%             keyboard
         end
     end
     

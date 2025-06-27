@@ -10,6 +10,8 @@ classdef triggered_waveform < epworks.p.parse_object
     properties
         children
         n_children
+
+        %epworks.p.iom.triggered_waveform.data
         data
 
         id

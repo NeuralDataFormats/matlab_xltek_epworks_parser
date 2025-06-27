@@ -23,12 +23,12 @@ classdef data < epworks.p.parse_object
         explicit_save
         hff_cutoff
         iom_local_object
-        is_alarmed_wave
-        is_captured
-        is_for_review
-        is_from_history
-        is_grabbed
-        is_rejected_data
+        is_alarmed_wave = -1
+        is_captured = -1
+        is_for_review = -1
+        is_from_history = -1
+        is_grabbed = -1
+        is_rejected_data = false
         left_display_gain
         lff_cutoff
         me_clone

@@ -47,6 +47,8 @@ classdef main < handle
         %rec_files_by_folder
 
         rec_files
+        orphaned_rec_files = false
+        orphaned_indices
         rec_file_info
 
         tst_data
@@ -57,11 +59,15 @@ classdef main < handle
     end
 
     methods
-        function obj = main(study_name_or_path)
+        function obj = main(study_path_or_iom_path)
+            %
+            %   Inputs
+            %   ------
+            %   
 
             %A study consists of multiple files. The file manager
             %takes care of knowing where those files are
-            obj.file_manager = epworks.parse.file_manager(study_name_or_path);
+            obj.file_manager = epworks.parse.file_manager(study_path_or_iom_path);
 
             obj.iom = epworks.parse.iom_parser(obj.file_manager.iom_file_path);
 
@@ -104,11 +110,19 @@ classdef main < handle
             
             tz_offset = obj.iom.s2.study(1).data.tz_offset;
             for iRec = 1:n_rec_files
-                rec_files_cell{iRec} = epworks.parse.rec_parser(...
+                temp = epworks.parse.rec_parser(...
                     all_rec_files{iRec},obj.iom.logger,tz_offset);
+                if temp.is_trace_orphan
+                    obj.orphaned_rec_files = true;
+                end
+                rec_files_cell{iRec} = temp;
             end
             
             obj.rec_files = [rec_files_cell{:}]; 
+
+            if obj.orphaned_rec_files
+                obj.orphaned_indices = find([obj.rec_files.is_trace_orphan]);
+            end
 
             name = string({obj.rec_files.name}');
             time = ([obj.rec_files.file_timestamp])';

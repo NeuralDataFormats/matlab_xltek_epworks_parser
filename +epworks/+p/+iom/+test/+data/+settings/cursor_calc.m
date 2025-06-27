@@ -55,7 +55,9 @@ classdef cursor_calc < epworks.p.parse_object
                         obj.from_def = value;
                     case 'ID'
                         obj.id = value;
-                        r.logID(obj,obj.id);
+                        %This is causing a redundant issue in one of my
+                        %files. Why is the same ID present twice?
+                        %r.logID(obj,obj.id);
                     case 'IsMarker'
                         obj.is_marker = value;
                     case 'Name'
