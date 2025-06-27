@@ -25,6 +25,20 @@ classdef eeg_waveform < epworks.objects.result_object
         data epworks.objects.signal
     end
 
+    properties (Dependent)
+        n_snippets
+    end
+
+    methods
+        function value = get.n_snippets(obj)
+            if isempty(obj.data)
+                value = 0;
+            else
+                value = obj.data.n_snippets;
+            end
+        end
+    end
+
     methods
         function obj = eeg_waveform(p_main,p,logger)
             obj = obj@epworks.objects.result_object(p,logger);
@@ -34,17 +48,45 @@ classdef eeg_waveform < epworks.objects.result_object
             obj.notch_cutoff = p.data.notch_cutoff;
 
             obj.parent = p.parent.id;
-            %Is this needed, I think the parent is the same
+            
             obj.trace = p.data.trace_obj.id;
 
             %???? How is .data populated?
-            %   - must be from: epworks.objects.result_object
+            %After the trace has been linked we get it from .trace
+            %
+            %   This is in the top level file (although perhaps it should
+            %   be a method to make it explicit)
 
         end
         function s = getData(obj,index,in)
+            %X Retrieves data with optional filtering
             %
+            %   s = getData(obj,index,varargin)
             %
-            %   TODO: document
+            %   Inputs
+            %   ------
+            %   index :
+            %       Which snippet to extract.
+            %
+            %   Optional Inputs
+            %   ---------------
+            %   filter : logical, default false
+            %       If true the data are filtered. Cutoffs must be > 0
+            %       to be used. Set to -1 to ignore/disable
+            %       Note filtering is currently done using Butterworth
+            %       filters with no phase correction (filter function,
+            %       not filt/filt)
+            %   time_format :
+            %       - datetime - default
+            %       - numeric - starting at 0 (in seconds)
+            %       - none
+            %       Specifies the format of the returned time array
+            %   notch_width : default 20
+            %   notch_order : default 8
+            %
+            %   Outputs
+            %   -------
+            %       s
             %
             %   This does:
             %   1. computes time array (if desired)
