@@ -2,9 +2,14 @@ classdef merged_waveform < handle
     %
     %   Class:
     %   epworks.p.rec.merged_waveform
+    %
+    %   See Also
+    %   --------
+    %   epworks.p.rec.waveform
 
     properties
         data
+        first_id
         fs
         t0
     end
@@ -23,6 +28,7 @@ classdef merged_waveform < handle
     methods
         function obj = merged_waveform(waveforms)
             obj.data = [waveforms.data];
+            obj.first_id = waveforms(1).id;
             obj.fs = waveforms(1).fs;
             obj.t0 = waveforms(1).timestamp;
         end

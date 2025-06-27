@@ -27,6 +27,7 @@ classdef data < epworks.p.parse_object
         resolution
         right_display_gain
         samp_freq
+        saved_stim_intensity
         sequence_number
         set_obj
         timebase
@@ -73,6 +74,8 @@ classdef data < epworks.p.parse_object
                         obj.right_display_gain = value;
                     case 'SampFreq'        
                         obj.samp_freq = value;
+                    case 'SavedStimIntensity'
+                        obj.saved_stim_intensity = value;
                     case 'SequenceNumber'  
                         obj.sequence_number = value;
                     case 'SetObjId'        
@@ -81,7 +84,12 @@ classdef data < epworks.p.parse_object
                         obj.timebase = value;
                     case 'Timestamp'       
                         obj.timestamp = epworks.utils.processType3time(value(1:8));
-                        obj.timestamp_part2 = double(typecast(value(9:16),'int32'));
+                        %This may have been a parse error and this may no
+                        %longer ever get called
+                        if length(value) > 8
+                            fprintf(2,'epworks.p.freerun_waveform.data, This was actually called\n')
+                            obj.timestamp_part2 = double(typecast(value(9:16),'int32'));
+                        end
                     case 'TraceObjId'     
                         obj.trace_obj = value;
                     case 'TriggerDelay'    

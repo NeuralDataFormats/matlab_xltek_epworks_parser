@@ -2,6 +2,10 @@ classdef applied_montage_key_tree
     %
     %   Class:
     %   epworks.ep.test.settings.applied_montage_key_tree
+    %
+    %   See Also
+    %   --------
+    %   
     
     properties
        Bin0

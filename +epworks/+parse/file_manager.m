@@ -8,7 +8,11 @@ classdef file_manager < handle
     %   Structure
     %   ---------
     %   iom - config info
-    %   
+    %   REC - where the waveform data exist   
+    %
+    %   See Also
+    %   --------
+    %   epworks.parse.main
     
     properties
         study_name
@@ -24,26 +28,28 @@ classdef file_manager < handle
         tst_file_paths   %
         tst_folder_names %
         rec_file_paths   %{1 x n_tst}{1 x n_rec}
+        spt_file_paths
     end
     
     methods
-        function obj = file_manager(study_name_or_path)
+        function obj = file_manager(study_path_or_iom_path)
             %
             %
-            %   obj = file_manager(*study_name_or_path)
+            %   obj = file_manager(*study_path)
+            %   obj = file_manager(*iom_path)
             %
-            %   study_name : must match the folder name that you wish to
-            %   read in the base study folder
+            %   Inputs
+            %   ------
+            %   iom_path : 
+            %       Path to the .iom file
+            %   study_path :
+            %       Path to the study folder (which holds the iom file)
             %
-            %   base_study_folder/[study_name]/something.iom
-            %
-            %   OR
-            %
-            %   study_path = 'C:/path/to/my_study/ which contains a .iom
-            %   file
-            %
+            if isstring(study_path_or_iom_path)
+                study_path_or_iom_path = char(study_path_or_iom_path);
+            end
             
-            if ~exist('study_name_or_path','var') || isempty(study_name_or_path)
+            if ~exist('study_path_or_iom_path','var') || isempty(study_path_or_iom_path)
                 [iom_file_name, base_path] = uigetfile( ...
                     {'*.iom', 'InterOperative Mon. (*.iom)'},'Please select an IOM file');
                 if iom_file_name == 0
@@ -51,19 +57,19 @@ classdef file_manager < handle
                    error('User canceled') 
                 end
             else
-                [base_path,iom_file_name,ext] = fileparts(study_name_or_path);
+                [base_path,iom_file_name,ext] = fileparts(study_path_or_iom_path);
                 if strcmp(ext,'.iom')
                     iom_file_name = [iom_file_name '.iom'];
                     %all done
                     
-                elseif exist(study_name_or_path,'dir')
-                    base_path = study_name_or_path;
+                elseif exist(study_path_or_iom_path,'dir')
+                    base_path = study_path_or_iom_path;
                     %We expect a single data (*.iom file)
                     iom_file_name = '';
                     %---------------------------------------------------------------
                 else
                     %Input is thought to be a name, not a folder
-                    study_name_local = study_name_or_path;
+                    study_name_local = study_path_or_iom_path;
 
                     %Get the base path from the user_options
                     user_options_obj = epworks.user_options.getInstance;
@@ -122,12 +128,17 @@ classdef file_manager < handle
             
             tst_file_paths_local = cell(1,n_tst);
             rec_file_paths_local = cell(1,n_tst);
+            spt_file_paths_local = cell(1,n_tst);
             
             for iTST = 1:n_tst
                 cur_tst_base_path = fullfile(history_base_path,tst_folder_names_local{iTST});
                 
                 tst_file_struct = dir(fullfile(cur_tst_base_path,'*.TST'));
                 if isempty(tst_file_struct)
+                    rec_file_struct = dir(fullfile(cur_tst_base_path,'*.REC'));
+                    if ~isempty(rec_file_struct)
+                        error('Assumption violated, fix code')
+                    end
                     continue
                 elseif length(tst_file_struct) ~= 1
                     error('Unhandled case')
@@ -135,17 +146,21 @@ classdef file_manager < handle
                     tst_file_paths_local{iTST} = fullfile(cur_tst_base_path,tst_file_struct.name);
                 end
                 
-                %ASSUMPTION: If there are no tst files, there are no rec files
-                
                 rec_file_struct = dir(fullfile(cur_tst_base_path,'*.REC'));
                 if ~isempty(rec_file_struct)
                     rec_file_paths_local{iTST} = epworks.sl.dir.fullfileCA(cur_tst_base_path,{rec_file_struct.name});
+                end
+
+                spt_file_struct = dir(fullfile(cur_tst_base_path,'*.SPT'));
+                if ~isempty(spt_file_struct)
+                    spt_file_paths_local{iTST} = epworks.sl.dir.fullfileCA(cur_tst_base_path,{spt_file_struct.name});
                 end
             end
             
             obj.tst_file_paths = tst_file_paths_local;
             obj.tst_folder_names = tst_folder_names_local;
             obj.rec_file_paths = rec_file_paths_local;
+            obj.spt_file_paths = spt_file_paths_local;
             
         end
     end

@@ -21,6 +21,7 @@ classdef eeg_waveform < epworks.objects.result_object
         notch_cutoff
         parent
         trace
+        note = 'should really use getData() instead of accessing .data'
         data epworks.objects.signal
     end
 
@@ -35,6 +36,10 @@ classdef eeg_waveform < epworks.objects.result_object
             obj.parent = p.parent.id;
             %Is this needed, I think the parent is the same
             obj.trace = p.data.trace_obj.id;
+
+            %???? How is .data populated?
+            %   - must be from: epworks.objects.result_object
+
         end
         function s = getData(obj,index,in)
             %

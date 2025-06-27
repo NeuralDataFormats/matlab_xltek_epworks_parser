@@ -7,7 +7,7 @@ classdef id_tracker < handle
     %   ---------
 
     properties
-        map
+        map containers.Map
     end
 
     methods
@@ -21,8 +21,13 @@ classdef id_tracker < handle
 
             %Note, if this is slow we can store as a matrix, as we
             %always have 16 bytes ...
-
-            obj.map(id2) = obj_to_log;
+            if isKey(obj.map,id2)
+                %TODO: Have optional warning that can be surpressed
+                %error("Redundant logging of ID, fix code")
+                %keyboard
+            else
+                obj.map(id2) = obj_to_log;
+            end
         end
         function out = getObjectByID(obj,id)
             id2 = char(id);

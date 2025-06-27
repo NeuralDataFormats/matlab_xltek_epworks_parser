@@ -9,9 +9,12 @@ classdef triggered_waveform < epworks.objects.result_object
     %   epworks.objects.trace
     %   epworks.objects.signal
     %   epworks.objects.eeg_waveform
+    %   epworks.p.iom.triggered_waveform
+    %
+    %   
 
     properties (Hidden)
-        id_props = {'parent','trace'}
+        id_props = {'parent','trace','set'}
     end
 
     properties
@@ -23,10 +26,25 @@ classdef triggered_waveform < epworks.objects.result_object
         color
         stim_intensity
         trigger_delay
+
+        %{
+%Others we could expose - not sure of defaults
+  is_captured: -1
+            is_for_review: -1
+          is_from_history: -1
+               is_grabbed: -1
+        %}
+
+        is_rejected_data
         
         parent
         trace
+        set
         data
+        
+
+        %Note, the data is populated afterwards by the main object
+        %after we have linked the trace object
     end
 
     methods
@@ -40,8 +58,11 @@ classdef triggered_waveform < epworks.objects.result_object
             obj.stim_intensity = p.data.saved_stim_intensity;
             obj.trigger_delay = p.data.trigger_delay;
 
+            obj.is_rejected_data = p.data.is_rejected_data;
+
             obj.parent = p.parent.id;
             obj.trace = p.data.trace_obj.id;
+            obj.set = p.data.set_obj.id;
         end
     end
 end

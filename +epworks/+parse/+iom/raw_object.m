@@ -10,6 +10,7 @@ classdef raw_object
     %   See Also
     %   --------
     %   epworks.parse.iom.raw_array
+    %   epworks.parse.iom.parse_type
 
     properties
         n_bytes_to_next
@@ -48,12 +49,23 @@ classdef raw_object
             props = cell(1,obj.n_props);
             prop_types = zeros(1,obj.n_props);
             for i = 1:obj.n_props
-                [value,I1,prop_type] = epworks.parse.iom.parse_type(bytes,I1,r,depth);
+                if i > 1
+                    temp_name = value;
+                else
+                    temp_name = '';
+                end
+                [value,I1,prop_type] = epworks.parse.iom.parse_type(bytes,I1,r,depth,temp_name);
                 prop_types(i) = prop_type;
                 props{i} = value;
+                % try
+                % if value == "AcquisitionTimeZone"
+                %     keyboard
+                % end
+                % end
             end
             obj.prop_types = prop_types;
             obj.props = props;
+            
         end
         function s = getStruct(obj)
             s = struct;

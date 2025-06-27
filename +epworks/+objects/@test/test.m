@@ -21,6 +21,7 @@ classdef test < epworks.objects.result_object
         
         %This may change ...
         raw_settings
+        settings
 
         %   points to study, NYI
         %parent
@@ -29,6 +30,11 @@ classdef test < epworks.objects.result_object
 
     methods
         function obj = test(p_main,p,logger)
+            %
+            %   Inputs
+            %   ------
+            %   p : epworks.p.iom.test
+
             obj = obj@epworks.objects.result_object(p,logger);
             obj.creation_time = p.data.creation_time;
             obj.state = p.data.state;
@@ -36,6 +42,7 @@ classdef test < epworks.objects.result_object
             obj.test_set_obj_count = p.data.test_set_obj_count;
 
             obj.raw_settings = p.data.settings;
+            obj.settings = epworks.objects.test.settings(p_main,p.data.settings,logger);
 
             %obj.parent = p.parent.id;
             obj.groups = {p.groups.id};

@@ -1,18 +1,22 @@
 classdef iom_parser < handle
     %
     %   Class:
-    %   epworks.parse.iom_parser
+    %   epworks.p.iom_parser
     %
     %   See Also
     %   --------
-    %   epworks.parse.main
+    %   epworks.p.main
     %   epworks.parse.raw_object
 
     properties
         bytes
         id1
         n
-        unknowns
+
+        unknowns %[n_objects x 20]
+        %The first 16 bytes seem to match id1
+        %- the last 4 bytes might be # of bytes for that object
+        %or something like that
 
         top_objects
         s
@@ -66,6 +70,7 @@ classdef iom_parser < handle
                 start_I = start_I + temp_obj.n_bytes_to_next;
             end
 
+            %obj.top_objects : epworks.parse.iom.raw_object
             obj.top_objects = [top_objects{:}];
 
             n_objects = length(obj.top_objects);
@@ -74,13 +79,29 @@ classdef iom_parser < handle
 
             %Creation of a structure array
             %---------------------------------------------------------
+            %
+            %   This makes the properties have safe names.
+            %
+            %   It also rearranges things a bit.
+            %   
             s_all = cell(1,n_objects);
             for i = 1:n_objects
+                %   epworks.parse.iom.raw_object.getStruct
                 s = obj.top_objects(i).getStruct();
                 s_all{i} = s;
             end
+
+            %s - struct
+            %   .guid
+            %   .array
+            %   .props
+            %       - field names are variable here, value is the value
+            %         for that property (field name)
+            %   .type
+            %   .depth
             obj.s = [s_all{:}];
 
+            %What is this?
             r.initializeObjectHolder();
 
 
@@ -139,6 +160,16 @@ classdef iom_parser < handle
             end
             %not logging the objs
             obj.s2 = s2;
+
+            %Fix timestamps
+            %--------------------------------------------
+            %   
+            %   Idea is to use s2.study on the other s2 fields
+
+            %keyboard
+
+
+
 
             %r : epworks.parse.iom.logger
             r.doObjectLinking();

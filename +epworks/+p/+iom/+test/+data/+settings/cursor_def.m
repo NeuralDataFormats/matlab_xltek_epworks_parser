@@ -65,7 +65,10 @@ classdef cursor_def < epworks.p.parse_object
                         obj.group_def = value;
                     case 'ID'
                         obj.id = value;
-                        r.logID(obj,value);
+                        %Causing issues in one of the files
+                        %  exp02__eeg_ecog
+                        %   Same for cursor_calc
+                        %r.logID(obj,value);
                     case 'IsMarker'
                         obj.is_marker = value;
                     case 'LatencyFrom'

@@ -5,10 +5,10 @@ classdef study < epworks.p.parse_object
     %
     %   See Also
     %   --------
-    %   epworks.p.patient
-    %   epworks.p.test
-    %   epworks.p.study.children
-    %   epworks.p.study.data
+    %   epworks.p.iom.patient
+    %   epworks.p.iom.test
+    %   epworks.p.iom.study.children
+    %   epworks.p.iom.study.data
     %
     %   Hierarchy
     %   ----------
@@ -53,6 +53,33 @@ classdef study < epworks.p.parse_object
                         obj.children = value;
                     case 'Data'
                         obj.data = epworks.p.iom.study.data(value,r);
+
+                        %Fixing of time zone
+                        %---------------------------------------------------
+                        %
+                        %   UNKNOWN: Is there a better way of doing this?
+                        %
+                        %   Set timezone for the created time then grab
+                        %   offset. This approach takes into account
+                        %   daylight savings.
+                        I = find(obj.data.acquisition_time_zone == char(0),1);
+                        
+                        input_timezone = obj.data.acquisition_time_zone(1:I-1);
+
+                        % Map to IANA name
+                        switch input_timezone
+                            case 'Eastern Standard Time'
+                                matlab_timezone = 'America/New_York';
+                            case 'Central Standard Time'
+                                matlab_timezone = 'America/Chicago';
+                            % add more mappings as needed
+                            otherwise
+                                error('Unknown or unsupported time zone name.');
+                        end
+
+                        obj.data.creation_time.TimeZone = matlab_timezone;
+                        obj.data.tz_offset = tzoffset(obj.data.creation_time);
+
                     case 'Id'
                         obj.id = value;
                         r.logID(obj,value);

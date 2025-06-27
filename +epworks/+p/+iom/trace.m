@@ -18,7 +18,10 @@ classdef trace < epworks.p.parse_object
         eeg_waveforms
         triggered_waveforms
 
-        rec_data
+        %This is populated by:
+        %   epworks.parse.rec_parser
+        rec_data = {};
+
         history
 
         data

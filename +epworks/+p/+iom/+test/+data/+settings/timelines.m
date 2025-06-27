@@ -7,11 +7,11 @@ classdef timelines < epworks.p.parse_object
         s
         id
         is_enabled
-        is_paused
-        is_running
-        is_waiting
+        is_paused = 0
+        is_running = 0
+        is_waiting = 0
         restart_delay
-        start_waiting
+        start_waiting = NaT
         type
     end
 
@@ -41,17 +41,6 @@ classdef timelines < epworks.p.parse_object
                 cur_name = fn{i};
                 value = p.(cur_name);
                 switch cur_name
-                    %{
-                    case 'AudioVolume'
-                        obj.audio_volume = double(typecast(s2.raw_data,'uint32'));
-                    case 'Color'
-                        obj.color = double(s2.raw_data);
-                    case 'HffCutoff'
-                        obj.hff_cutoff = typecast(s2.raw_data,'double');
-                    case 'IsAlarmedWave'
-                        obj.is_alarmed_wave = double(typecast(s2.raw_data,'uint32'));
-                    %}
-
                     case 'ID'
                         obj.id = value;
                         r.logID(obj,obj.id);
@@ -66,7 +55,9 @@ classdef timelines < epworks.p.parse_object
                     case 'RestartDelay'
                         obj.restart_delay = value;
                     case 'StartWaiting'
-                        obj.start_waiting = value;
+                        if ~isempty(value)
+                            obj.start_waiting = epworks.utils.processType3time(value);
+                        end
                     case 'Type'
                         obj.type = value;
                     otherwise

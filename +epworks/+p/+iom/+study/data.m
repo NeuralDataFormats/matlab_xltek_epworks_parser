@@ -2,12 +2,18 @@ classdef data < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.iom.study.data
+    %
+    %   See Also
+    %   --------
+    %   epworks.p.iom.study
 
     properties
         acquisition_instrument
         acquisition_time_zone
+
         %hours
-        time_offset
+        tz_offset %hours
+
         comm_channel_handle
         creation_time
         creator
@@ -44,13 +50,18 @@ classdef data < epworks.p.parse_object
                     case 'AcquisitionTimeZone'
                         %Guessing that the first bit is 300 minutes diff
                         %
-                        %   2 byte chars, not sure why the 
-                        %   truncation: 'Easter'
-                        %44     1     0     0    69     0    97     0   115     0   116     0   101     0   114     0
+                        % JAH: 6/24/2025 - bug fix, time zone fixed
+
+                        %First 4 bytes are for the standard time
+                        %
+                        %   
+
                         obj.acquisition_time_zone = char(value(5:2:end));
+                        %This is no longer used and is changed in the
+                        %parent
                         temp = -1*double(typecast(value(1:4),'uint32'))/60;
-                        obj.time_offset = hours(temp);
-                        r.time_offset;
+                        obj.tz_offset = hours(temp);
+                        %r.time_offset;
                     case 'CommChannelHandle'
                         obj.comm_channel_handle = value;
                     case 'CreationTime'
@@ -62,6 +73,8 @@ classdef data < epworks.p.parse_object
                     case 'EegNoLabel'
                         obj.eeg_no_label = value;
                     case 'EndTime'
+                        %this is a string
+                        %e.g., '20220614:2138Z'
                         obj.end_time = value;
                     case 'FileName'
                         obj.file_name = value;

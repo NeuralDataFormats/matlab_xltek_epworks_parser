@@ -2,6 +2,12 @@ classdef data < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.eeg_waveform.data
+    %
+    %   See Also
+    %   --------
+    %   epworks.parse.iom_parser
+    %   epworks.parse.iom.raw_object
+    %   epworks.p.iom.eeg_waveform
 
     properties (Hidden)
         id_props = {'set_obj','trace_obj'}
