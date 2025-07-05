@@ -16,11 +16,11 @@ classdef data < epworks.p.parse_object
     properties
         set_number
         group_obj
-        iom_local_object
-        is_active
-        is_from_history
-        num_accepted
-        num_rejected
+        iom_local_object = false
+        is_active = false
+        is_from_history = false
+        num_accepted = NaN
+        num_rejected = NaN
     end
 
     methods

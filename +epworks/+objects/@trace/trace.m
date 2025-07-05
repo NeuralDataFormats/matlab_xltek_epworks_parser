@@ -22,7 +22,10 @@ classdef trace < epworks.objects.result_object
         %montage layout info instead.
         origin_x
         origin_y
-        data
+
+        eeg_waveforms
+        triggered_waveforms
+        freerun_waveforms
     end
 
     methods
@@ -39,20 +42,13 @@ classdef trace < epworks.objects.result_object
             obj.origin_x = p.data.origin_x;
             obj.origin_y = p.data.origin_y;
 
-            %See code in epworks.parse.rec_parser
-            %
-            %This may not always be parsed correctly
-            %
-            %   rec_data - comes from 
-            
-            if ~isempty(p.rec_data)
-                obj.data = epworks.objects.signal(p.rec_data,obj.name);
-            end
-
             obj.parent = p.parent.id;
 
         end
         function processPostLinking(objs)
+            %
+            %   - populate parent name
+            %   
             for i = 1:length(objs)
                 obj = objs(i);
                 obj.group_name = obj.parent.name;

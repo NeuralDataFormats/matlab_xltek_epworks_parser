@@ -9,11 +9,13 @@ classdef eeg_waveform < epworks.objects.result_object
     %   epworks.objects.trace
     %   epworks.objects.signal
     %   epworks.objects.triggered_waveform
+    %   epworks.objects.freerun_waveform
 
     properties (Hidden)
         id_props = {'parent','trace'}
     end
 
+    
     properties
         name
         lff_cutoff
@@ -23,6 +25,8 @@ classdef eeg_waveform < epworks.objects.result_object
         trace
         note = 'should really use getData() instead of accessing .data'
         data epworks.objects.signal
+
+        trace_id
     end
 
     properties (Dependent)
@@ -50,12 +54,13 @@ classdef eeg_waveform < epworks.objects.result_object
             obj.parent = p.parent.id;
             
             obj.trace = p.data.trace_obj.id;
+            %This we will not override
+            obj.trace_id = obj.trace;
 
-            %???? How is .data populated?
-            %After the trace has been linked we get it from .trace
-            %
-            %   This is in the top level file (although perhaps it should
-            %   be a method to make it explicit)
+            wtg = p_main.getWaveformTraceGroupFromTraceID(obj.trace);
+            if ~isempty(wtg)
+                obj.data = epworks.objects.signal(wtg,p.data.trace_obj.name);
+            end
 
         end
         function s = getData(obj,index,in)

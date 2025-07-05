@@ -5,7 +5,7 @@ classdef data < epworks.p.parse_object
     %
     %   See Also
     %   --------
-    %   epworks.p.triggered_waveform
+    %   epworks.p.iom.triggered_waveform
     %   
     %   
 
@@ -41,7 +41,7 @@ classdef data < epworks.p.parse_object
         resolution
         right_display_gain
         samp_freq
-        saved_stim_intensity
+        saved_stim_intensity = NaN
         sequence_number
         set_obj
         smooth_sel

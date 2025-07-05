@@ -21,6 +21,7 @@ classdef rec_parser < handle
     end
     
     properties
+        loop_id
         file_path
         file_name
         folder_time
@@ -53,19 +54,33 @@ classdef rec_parser < handle
         trace
         ochan
         fs
-        is_trace_orphan = false
+
+        is_trace_orphan = false %This is true 
     end
 
     methods
-        function obj = rec_parser(file_path,logger,tz_offset)
+        function obj = rec_parser(file_path,logger,tz_offset,loop_id)
+            %
+            %
+            %   Called By
+            %   ---------
+            %   epworks.parse.main
+            %
+            %   
             
+            obj.loop_id = loop_id;
+
             INTRO_BYTE_LENGTH = 96;
 
             obj.file_path = file_path;
 
             [root,obj.file_name] = fileparts(file_path);
+
+            %Extraction of time from folder name
+            %--------------------------------------------------------------
             %The timing info is in the name of the parent folder
             %so go up one more level
+
             [~,~,ext] = fileparts(root);
             %The period '.' in the folder path causes the part we care
             %about to be in the extension not in the name
@@ -78,6 +93,9 @@ classdef rec_parser < handle
             %Stored in reverse byte order, flip and pass in
             obj.folder_time = epworks.utils.processType3time(temp(end:-1:1));
             
+
+            %Read and process file
+            %--------------------------------------------------------------
             r = epworks.sl.io.fileRead(file_path,'*uint8');
 
             obj.bytes = r;
@@ -127,12 +145,16 @@ classdef rec_parser < handle
             obj.trace = logger.getObjectByID(trace_ID);
             obj.ochan = logger.getObjectByID(ochan_ID);
 
+
+            %TODO: This will no longer be needed soon
+            %----------------------------------------------------
+            %----------------------------------------------------
             %Link this object from the trace
             if ~isempty(obj.trace)
 
                 %TODO: We should probably make this more explicit
                 %
-                %   When building traces, go through and find
+                %   i.e., when building traces, go through and find
                 %   relevant rec files
                 obj.trace.rec_data = [obj.trace.rec_data {obj}];
     
@@ -145,6 +167,8 @@ classdef rec_parser < handle
 
                 %Does this mean we have no data?
             end
+            %----------------------------------------------------
+            %----------------------------------------------------
             
             obj.default_length = double(typecast(intro(61:64),'uint32'));
             
@@ -168,6 +192,8 @@ classdef rec_parser < handle
                 else
                     info = obj.trace.triggered_waveforms(1).data;
                 end
+
+                %What if we have only a freerun_waveform?????
     
                 %JAH: 6/24/2025 - why is this not just samp_freq?
                 %       - should describe file where I found this to be
@@ -176,7 +202,6 @@ classdef rec_parser < handle
                 %obj.fs = info.samp_freq;
             else
                 %JAH: 6/24/2025 - this may not be correct ...
-
 
                 temp = obj.ochan.to;
                 obj.fs = temp.sampling_freq/obj.ochan.timebase;
@@ -205,7 +230,8 @@ classdef rec_parser < handle
             entries = cell(1,n_waveforms);
             for i = 1:n_waveforms
                 temp = epworks.p.rec.waveform(i,data_matrix(:,i),...
-                    obj.default_length,obj.trace,obj.ochan,obj.fs,tz_offset);
+                    obj.default_length,obj.trace,obj.ochan,obj.fs,...
+                    tz_offset,loop_id);
                 entries{i} = temp;
                 %These IDs match the parsed objects
                 %In particular, the first one I saw matched:
@@ -215,56 +241,7 @@ classdef rec_parser < handle
 
             obj.waveforms = [entries{:}];
 
-            %obj.all_first_100 = vertcat(obj.waveforms.first_100);
-
-
-            %UNKNOWN: Can we tell types
-            %
-            %   I think at this point we could if we passed in the IOM
-            %   parsing which happens before this.
-            %
-            %   Although I'm not sure how to get the parent object for
-            %   each waveform. I guess that is in trace and ochan
-            %   properties.
-            %
-            %
-            %TODO: We could probably omit this for triggered waveforms
-            %
-            %   This IS needed for eeg_waveforms
-            %
-            %   Note, this is an attempt to stich multiple waveforms
-            %   together into one waveform based on the gap in time between
-            %   the end of one set of data and the start of the next
-            CUTOFF_RATIO = 1;
-            dt = 1/obj.fs;
-            is_start = false(1,n_waveforms);
-            is_start(1) = true;
-            is_stop = false(1,n_waveforms);
-            is_stop(end) = true;
-            for i = 1:(n_waveforms-1)
-                w1 = obj.waveforms(i);
-                t1 = w1.t_end;
-                w2 = obj.waveforms(i+1);
-                t2 = w2.t_1;
-                delta_time = abs(seconds(t2-t1) - dt);
-                if delta_time/dt < CUTOFF_RATIO
-                    %continue
-                else
-                    is_stop(i) = true;
-                    is_start(i+1) = true;
-                end
-            end
-
-            I1 = find(is_start);
-            I2 = find(is_stop);
-            n_merged = length(I1);
-            merged_all = cell(1,n_merged);
-            for i = 1:n_merged
-                waves_use = obj.waveforms(I1(i):I2(i));
-                merged_all{i} = epworks.p.rec.merged_waveform(waves_use);
-            end
-
-            obj.merged_waveforms = [merged_all{:}];
+            
         end
 
         function plot(obj,varargin)
@@ -307,6 +284,14 @@ classdef rec_parser < handle
                 %pause
             end
             hold off
+        end
+        function getWaveformInfo(objs)
+
+            w = [objs.waveforms];
+
+            wtf = vertcat(w.first_400);
+
+           keyboard
         end
     end
     

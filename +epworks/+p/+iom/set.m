@@ -2,6 +2,10 @@ classdef set < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.iom.set
+    %
+    %   See Also
+    %   --------
+    %   epworks.objects.set
 
     properties (Hidden)
         id_props = {'parent'}

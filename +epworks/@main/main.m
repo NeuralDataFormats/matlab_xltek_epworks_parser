@@ -43,6 +43,16 @@ classdef main < epworks.RNEL.handle_light
     %       .active_electrode
     %       .ref_electrode
     %
+    %
+    %   Improvements
+    %   ------------
+    %   1) Some waveforms do not have a trace object. Create an orphaned
+    %   waveforms section until we know what these are and how to better
+    %   handle them.
+    %   2) We could do some first passes at speed. Right now the focus has
+    %   largely been on getting something that works.
+    %
+    %
     %   Unhandled and Unknowns
     %   ----------------------
     %   1. Lots of small unknowns. Tried to start using "UNKNOWN" to
@@ -63,23 +73,45 @@ classdef main < epworks.RNEL.handle_light
     properties (Hidden)
         s %This is a structure that holds all of the top level parsed
         %objects.
+
+        triggered_waveforms_unsorted
+        %sets_unsorted
     end
 
     properties
         
-        p %Parsed information epworks.parse.main
+        p epworks.parse.main
+        %(P)arsed information 
+        %
+        %   This is closer to the raw form of the data
 
-        info
-        traces
-        groups
-        sets
-        tests
-        studies
-        eeg_waveforms
+        traces epworks.objects.trace
+        %These are signal definitions
+        %
+        %   Note, I believe the name is not unique. It is only
+        %   unique with the group. Multiple groups may have traces
+        %   with the same name.
+        
+        groups epworks.objects.group
+        %Groups are collections of channels.
+
+        sets epworks.objects.set
+        tests epworks.objects.test
+        studies epworks.objects.study
+
+        eeg_waveforms epworks.objects.eeg_waveform
+        %
+
         triggered_waveforms
+
         freerun_waveforms
 
         notes
+
+        group_info
+        eeg_info
+        freerun_info
+        triggered_info
 
         %Not yet exposed - these are parsed
         % - patient
@@ -88,7 +120,12 @@ classdef main < epworks.RNEL.handle_light
     end
     
     methods
-        function obj = main(study_path_or_iom_path)
+        function obj = main(study_path_or_iom_path,options)
+
+            arguments
+                study_path_or_iom_path
+                options.sort_by_display = true;
+            end
             
             if nargin == 0
                 study_path_or_iom_path = '';
@@ -163,6 +200,10 @@ classdef main < epworks.RNEL.handle_light
             end
             obj.sets = [temp_objs{:}];
 
+            set_numbers = [obj.sets.set_number];
+            [~,I] = sort(set_numbers);
+            obj.sets = obj.sets(I);
+
             %Test creation
             %--------------------------------------------------------------
             p_obj = obj.s.test;
@@ -188,7 +229,7 @@ classdef main < epworks.RNEL.handle_light
             for i = 1:length(p_obj)
                 temp_objs{i} = epworks.objects.triggered_waveform(obj.p,p_obj(i),logger);
             end
-            obj.triggered_waveforms = [temp_objs{:}];
+            obj.triggered_waveforms_unsorted = [temp_objs{:}];
 
             %Freerun Waveform creation
             %--------------------------------------------------------------
@@ -199,7 +240,14 @@ classdef main < epworks.RNEL.handle_light
             end
             obj.freerun_waveforms = [temp_objs{:}];
 
-            %ID to object translation
+            %No match with the waveform IDs
+            % free_ids = vertcat(obj.freerun_waveforms.id);
+            % [mask3,loc3] = ismember(free_ids,obj.p.merged_waveform_ids,'rows');
+            % [mask4,loc4] = ismember(free_ids,obj.p.waveform_ids,'rows');
+
+            %--------------------------------------------------------------
+            %--------------------------------------------------------------
+            %                   ID to object translation
             %--------------------------------------------------------------
             %  
             %   We want properties to point to "clean" objects, not the 
@@ -212,43 +260,202 @@ classdef main < epworks.RNEL.handle_light
             %
             %   That's what we're doing here.
             logger.doObjectLinking();
+            %--------------------------------------------------------------
+            %--------------------------------------------------------------
+            %--------------------------------------------------------------
+
+
+            %epworks.objects.group
+            obj.groups.processPostLinking(obj.tests(1),options);
+            
+            %epworks.objects.trace
+            obj.traces.processPostLinking();
+
+            obj.sets.processPostLinking();
+
+            %Adding group name for triggered waveforms
+            %--------------------------------------------------------------
+            for i = 1:length(obj.triggered_waveforms_unsorted)
+                obj.triggered_waveforms_unsorted(i).group_name = ...
+                    obj.triggered_waveforms_unsorted(i).set.group_name;
+            end
+
+            %Place Triggered Waveforms in their correct set
+            %--------------------------------------------------------------
+            %   
+            %   Note, this needs to be AFTER set post linking
+            %
+            %   epworks.objects.triggered_waveform
+            %   epworks.objects.freerun_waveform
+            %   epworks.objects.eeg_waveform
+
+            %   TW: set, epworks.objects.triggered_waveform
+
+            tw = obj.triggered_waveforms_unsorted;
+
+            tw__set_number = [tw.set_number];
+            tw__group_name = {tw.group_name};
+
+            for i = 1:length(obj.sets)
+                mask = obj.sets(i).set_number == tw__set_number & ...
+                    strcmp(obj.sets(i).group_name,tw__group_name);
+                if any(mask)
+                    obj.sets(i).triggered_waveforms = tw(mask);
+                end
+            end
+
+            %Create set info for each group
+            %--------------------------------
+            %Ugh, look away ....
+            obj.groups.processPostLinking2();
+
+            %Slim down the triggered waveforms, grouping by trace
+            %--------------------------------------------------------------
+            %
+            %   .triggered_waveforms_unsorted contains all TW for all sets
+            %   and all groups. Often though I think you want to first
+            %   narrow in on a specific set or trace. This helps with
+            %   narrowing by trace. Above we narrowed by set.
+            
+            tw_trace_ids = vertcat(obj.triggered_waveforms_unsorted.trace_id);
+            [~,ia,ic] = unique(tw_trace_ids,'rows');
+            n_unique = length(ia);
+            tw_groups_cell = cell(n_unique,1);
+            for i = 1:length(ia)
+                tw_groups_cell{i} = epworks.objects.triggered_waveform_group(...
+                    obj.triggered_waveforms_unsorted(i == ic));
+
+                temp = tw_groups_cell{i};
+                temp.group_name = temp.group_name;
+            end
+
+            obj.triggered_waveforms = [tw_groups_cell{:}];
+
+            %Linking of data to the traces
+            %--------------------------------------------------------------
+            %
+            %   At this point we have data in:
+            %   - triggered_waveforms
+            %   - freerun_waveforms
+            %   - eeg_waveforms
+
+            tw_trace_ids = vertcat(obj.triggered_waveforms.trace_id);
+            eeg_trace_ids = vertcat(obj.eeg_waveforms.trace_id);
+            fr_trace_ids = vertcat(obj.freerun_waveforms.trace_id);
+            trace_ids = vertcat(obj.traces.id);
+            for i = 1:size(trace_ids,1)
+                cur_trace_id = trace_ids(i,:);
+                mask = ismember(tw_trace_ids,cur_trace_id,'rows');
+                if any(mask)
+                    obj.traces(i).triggered_waveforms = obj.triggered_waveforms(mask);
+                end
+
+                mask = ismember(fr_trace_ids,cur_trace_id,'rows');
+                if any(mask)
+                    obj.traces(i).freerun_waveforms = obj.freerun_waveforms(mask);
+                end
+
+                mask = ismember(eeg_trace_ids,cur_trace_id,'rows');
+                if any(mask)
+                    obj.traces(i).eeg_waveforms = obj.eeg_waveforms(mask);
+                end
+            end
+
+
+
+            %Need to align by:
+            %1) Set #
+            %2) Group ID
+
+
+
+
 
             %After linking processing
             %--------------------------------------------------------------
             %Note, I'm currently assuming only 1 test ...
             %ASSUMPTION
-            obj.groups.processPostLinking(obj.tests(1));
             
-            obj.traces.processPostLinking();
 
-            %This needs to be done after linking since the linking
-            %trades the ID for the created object
-            for i = 1:length(obj.eeg_waveforms)
-                w = obj.eeg_waveforms(i);
-                %Moving the trace data to the parent data for easier access
-                w.data = w.trace.data;
-            end
-
-            for i = 1:length(obj.triggered_waveforms)
-                w = obj.triggered_waveforms(i);
-                w.data = w.trace.data;
-            end
-
-            for i = 1:length(obj.freerun_waveforms)
-                w = obj.freerun_waveforms(i);
-                w.data = w.trace.data;
-            end
 
             %Some additional info population
             %
             %   Note, if we rearrange things we should update this as
             %   the tables show index order.
-            obj.info = epworks.main.table_info(obj);
+
+            %TODO: Move this back into this parent class, too hidden
+            %obj.info = epworks.main.table_info(obj);
+
+
+            %Info
+            %---------------------------------------------------------
+
+            %Group Info
+            %----------------------------------------------------------
+            groups = obj.groups;
+            n_groups = length(groups);
+            %TODO: Move this as method to group class
+            index = (1:n_groups)';
+            name = string({groups.name}');
+            is_eeg_group = [groups.is_eeg_group]';
+            state = [groups.state]';
+            signal_type = [groups.signal_type]';
+            sweeps_per_avg = [groups.sweeps_per_avg]';
+            trigger_delay = [groups.trigger_delay]';
+            n_sets = zeros(n_groups,1);
+            n_traces = zeros(n_groups,1);
+            for i = 1:n_groups
+                n_sets(i) = length(groups(i).sets);
+                n_traces(i) = length(groups(i).traces);
+            end
+
+            obj.group_info = table(index,name,n_sets,n_traces,is_eeg_group,state,signal_type,sweeps_per_avg,trigger_delay);
+
+            % % obj.triggered_info = h__getWaveformInfo(obj.triggered_waveforms);
+            % % obj.freerun_info = h__getWaveformInfo(obj.freerun_waveforms);
+            % % obj.eeg_info = h__getWaveformInfo(obj.eeg_waveforms);
+
+            %--------------------------------------------------------------
 
             obj.notes = epworks.objects.notes(obj.p,obj.studies);
 
         end
+        function g = getGroup(obj,group_name)
+            %
+            %   g = getGroup(obj,group_name)
+            %   
+            
+            %TODO: Support insensitive
+            I = find(strcmpi(obj.group_info.name,group_name));
+            if isempty(I)
+                error('Group not found: requested: %s',group_name)
+            end
+            if length(I) > 1
+                error('Multiple matches for group found: requested: %s',group_name)
+            end
+            g = obj.groups(I);
+        end
     end
     
+end
+
+function info = h__getWaveformInfo(s)
+    if isempty(s)
+        info = table([], [], [], [], 'VariableNames', {'index', 'name', 't0','n_data'});
+        return
+    end
+
+    index = (1:length(s))';
+    name = string({s.name}');
+    t0 = NaT(length(name),1);
+    n_data = zeros(length(name),1);
+    for i = 1:length(name)
+        if ~isempty(s(i).data)
+            t0(i) = s(i).data.t0(1);
+            n_data(i) = length(s(i).data.data);
+        end
+    end
+
+    info = table(index,name,t0,n_data);
 end
 

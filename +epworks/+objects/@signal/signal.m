@@ -25,28 +25,33 @@ classdef signal < handle
     end
 
     methods
-        function obj = signal(p_rec,name)
-            obj.name = name;
-            obj.p = p_rec;
+        function obj = signal(p_trace_waveform_group,name)
+            %
+            %   s = epworks.objects.signal(p_trace_waveform_group,name)
+            %
+            %   Inputs
+            %   ------
+            %   p_trace_waveform_group : epworks.p.rec.waveform_trace_group
+            %
+            %
+            %   See Also
+            %   ---------
+            %   epworks.p.rec.waveform_trace_group
+            %
+            %   
             
-            n_rec_files = length(p_rec);
-            mw = cell(1,n_rec_files);
-            fs_all = zeros(1,n_rec_files);
-            for i = 1:n_rec_files
-                mw{i} = p_rec{i}.merged_waveforms;
-                fs_all(i) = p_rec{i}.fs;
-            end
+            obj.name = name;
+            obj.p = p_trace_waveform_group;
+            
+            mw = obj.p.merged_waveforms;
 
+            fs_all = [mw.fs];
             if ~all(fs_all == fs_all(1))
-                error('Assumption violated')
+                error('assumption violated')
             end
 
-            w = [mw{:}];
-
-            %w = p_rec.merged_waveforms;
-
-            obj.t0 = [w.t0];
-            obj.data = {w.data};
+            obj.t0 = [mw.t0];
+            obj.data = {mw.data};
             obj.n_snippets = length(obj.data);
             obj.fs = fs_all(1);
         end

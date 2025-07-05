@@ -7,6 +7,7 @@ classdef freerun_waveform < epworks.objects.result_object
     %   --------
     %   epworks.main
     %   epworks.objects.trace
+    %   epworks.objects.eeg_waveform
 
     properties (Hidden)
         id_props = {'parent','trace'}
@@ -20,7 +21,8 @@ classdef freerun_waveform < epworks.objects.result_object
         color
         parent
         trace
-        data
+        trace_id
+        data epworks.objects.signal
     end
 
     methods
@@ -34,6 +36,13 @@ classdef freerun_waveform < epworks.objects.result_object
 
             obj.parent = p.parent.id;
             obj.trace = p.data.trace_obj.id;
+            %This we will not override
+            obj.trace_id = obj.trace;
+
+            wtg = p_main.getWaveformTraceGroupFromTraceID(obj.trace);
+            if ~isempty(wtg)
+                obj.data = epworks.objects.signal(wtg,p.data.trace_obj.name);
+            end
         end
     end
 end

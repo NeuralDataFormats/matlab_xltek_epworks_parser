@@ -56,7 +56,7 @@ classdef triggered_waveform < epworks.p.parse_object
                         keyboard
                 end
             end
-
+            obj.n_children = length(obj.children);
 
         end
     end
