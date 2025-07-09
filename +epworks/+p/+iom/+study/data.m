@@ -101,9 +101,12 @@ classdef data < epworks.p.parse_object
                         obj.request_update_initialization = value;
                         r.logUnknownID('study_data_RequestUpdateInitialization',value);
                     otherwise
-                        keyboard
+                        safe_name = epworks.utils.getSafeVariableName(cur_name);
+                        obj.unhandled_props.(safe_name) = value;
                 end
             end
+            
+            r.logUnhandledProps(obj);
             
         end
     end

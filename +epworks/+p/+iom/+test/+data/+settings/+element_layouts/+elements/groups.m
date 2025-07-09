@@ -4,6 +4,7 @@ classdef groups < epworks.p.parse_object
     %   epworks.p.iom.test.data.settings.element_layouts.elements.groups
 
     properties
+        %This points to a group def
         guid
     end
 
@@ -19,9 +20,12 @@ classdef groups < epworks.p.parse_object
                     case 'Guid'
                         obj.guid = value;
                     otherwise
-                        keyboard
+                        safe_name = epworks.utils.getSafeVariableName(cur_name);
+                        obj.unhandled_props.(safe_name) = value;
                 end
             end
+
+            r.logUnhandledProps(obj);
             
         end
     end

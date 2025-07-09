@@ -33,9 +33,12 @@ classdef app_test_settings < epworks.p.parse_object
                     case 'Version'
                         obj.build = value;
                     otherwise
-                        keyboard
+                        safe_name = epworks.utils.getSafeVariableName(cur_name);
+                        obj.unhandled_props.(safe_name) = value;
                 end
             end
+
+            r.logUnhandledProps(obj);
             
         end
     end

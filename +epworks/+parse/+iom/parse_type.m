@@ -11,7 +11,7 @@ function [value,I1,prop_type] = parse_type(bytes,I1,r,depth,temp_name)
     %fprintf('%d: %d\n',I1,n_next);
     switch bytes(I1)
         case -1
-            keyboard
+            error('Unexpected value')
         case 0
             %4 bytes, interpretation varies
             %   - often int32
@@ -73,7 +73,7 @@ function [value,I1,prop_type] = parse_type(bytes,I1,r,depth,temp_name)
                 error('Fix this code like we did for case 3')
                 %Make it look like 3
                 %- this will have downstream effects with value parsing
-                keyboard
+                
             end
             value = bytes(start_I:stop_I);
         otherwise

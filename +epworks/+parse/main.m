@@ -52,7 +52,12 @@ classdef main < handle
         waveform_trace_groups
 
         orphaned_rec_files = false
-        orphaned_indices
+        
+        
+        orphaned_indices %These are the indices of the .REC files with no 
+        % trace object. You can index into .rec_files based on these
+        % indices.
+
         rec_file_info
 
         tst_data
@@ -60,6 +65,8 @@ classdef main < handle
         notes
 
         logger
+
+        unhandled_iom_props
     end
 
     methods
@@ -115,7 +122,8 @@ classdef main < handle
             tz_offset = obj.iom.s2.study(1).data.tz_offset;
             for iRec = 1:n_rec_files
                 temp = epworks.parse.rec_parser(...
-                    all_rec_files{iRec},obj.iom.logger,tz_offset,iRec);
+                    all_rec_files{iRec},obj.iom.logger,tz_offset,iRec,...
+                    obj.iom.bytes);
                 if temp.is_trace_orphan
                     obj.orphaned_rec_files = true;
                 end
@@ -131,9 +139,15 @@ classdef main < handle
             all_trace_ids = vertcat(obj.all_waveforms.trace_id);
             [unique_trace_ids,ia,ic] = unique(all_trace_ids,"rows");
             obj.unique_trace_ids_from_waveforms = unique_trace_ids;
+            %This is the null ID we added for missing traces
+            if all(unique_trace_ids(1,:) == 0)
+                start_I = 2;
+            else
+                start_I = 1;
+            end
             n_unique = length(ia);
             trace_groups = cell(1,n_unique);
-            for i = 1:n_unique
+            for i = start_I:n_unique
                 w_for_trace = obj.all_waveforms(ic == i);
                 trace_groups{i} = epworks.p.rec.waveform_trace_group(w_for_trace);
             end
@@ -166,7 +180,9 @@ classdef main < handle
 
             obj.logger = obj.iom.logger;
 
-            %Things not parsed
+            %Unhandled props
+            %------------------------------------------------
+            obj.unhandled_iom_props = obj.logger.unhandled_props;
         end
         function wtg = getWaveformTraceGroupFromTraceID(obj,trace_id)
             mask = ismember(obj.unique_trace_ids_from_waveforms,trace_id,'rows');

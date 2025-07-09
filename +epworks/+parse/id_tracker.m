@@ -24,18 +24,32 @@ classdef id_tracker < handle
             if isKey(obj.map,id2)
                 %TODO: Have optional warning that can be surpressed
                 %error("Redundant logging of ID, fix code")
-                %keyboard
             else
                 obj.map(id2) = obj_to_log;
             end
         end
         function out = getObjectByID(obj,id)
-            id2 = char(id);
+            %
+            %
+            %   id: [1x16] uint8 OR {[1x16] uint8]}
 
-            if isKey(obj.map,id2)
-                out = obj.map(id2);
+            if iscell(id)
+                out = cell(1,length(id));
+                for i = 1:length(id)
+                    temp = id{i};
+                    id2 = char(temp);
+                    try
+                        out{i} = obj.map(id2);
+                    end
+                end
             else
-                out = [];
+                id2 = char(id);
+    
+                if isKey(obj.map,id2)
+                    out = obj.map(id2);
+                else
+                    out = [];
+                end
             end
         end
     end

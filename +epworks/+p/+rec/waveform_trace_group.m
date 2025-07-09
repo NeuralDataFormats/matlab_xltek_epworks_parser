@@ -24,10 +24,6 @@ classdef waveform_trace_group < handle
             file_ids = [w.file_id];
             obj.n_unique_file_ids = length(unique(file_ids));
 
-            % b45_all = [w.b45];
-            % if ~isempty(obj.merged_waveforms)
-            %     keyboard
-            % end
         end
     end
 end

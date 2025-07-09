@@ -66,9 +66,12 @@ classdef history_view < epworks.p.parse_object
                     case 'ShowCursors'
                         obj.show_cursors = value;
                     otherwise
-                        keyboard
+                        safe_name = epworks.utils.getSafeVariableName(cur_name);
+                        obj.unhandled_props.(safe_name) = value;
                 end
             end
+
+            r.logUnhandledProps(obj);
             
         end
     end

@@ -26,7 +26,7 @@ classdef rec_parser < handle
         file_name
         folder_time
 
-        name
+        name = ''
 
         first_ID %The first ID seen in the file. This is the same
         %for all .REC files I've seen;
@@ -53,20 +53,28 @@ classdef rec_parser < handle
 
         trace
         ochan
-        fs
+        fs = NaN
 
         is_trace_orphan = false %This is true 
     end
 
     methods
-        function obj = rec_parser(file_path,logger,tz_offset,loop_id)
+        function obj = rec_parser(file_path,logger,tz_offset,loop_id,iom_bytes)
             %
             %
             %   Called By
             %   ---------
             %   epworks.parse.main
             %
-            %   
+            %   Inputs
+            %   ------
+            %   file_path
+            %   logger :
+            %   tz_offset :
+            %   loop_id :
+            %       This number helps us keep track of which rec file
+            %       generated each waveform. It is simply the looping
+            %       variable from the caller (1,2,3,etc.)
             
             obj.loop_id = loop_id;
 
@@ -160,12 +168,30 @@ classdef rec_parser < handle
     
                 obj.name = obj.trace.name;
             else
+                if ~isempty(obj.ochan)
+                    obj.name = obj.ochan.name;
+                end
                 %error('Need to verify this only occurs for empty')
                 %otherwise we're losing data
-                obj.name = obj.ochan.name;
+
+                %{
+                %Checking if I somehow missed this in the iom file.
+                %
+                %  Perhaps it is in the .tst file?
+
+                wtf = char(iom_bytes);
+                wtf2 = char(trace_ID);
+                wtf3 = char(ochan_ID);
+
+                strfind(wtf,wtf2)
+                strfind(wtf,wtf3)
+
+                %}
+
                 obj.is_trace_orphan = true;
 
-                %Does this mean we have no data?
+                %Does this mean we have no data? No, but we can't link it
+                %to anything
             end
             %----------------------------------------------------
             %----------------------------------------------------
@@ -200,7 +226,7 @@ classdef rec_parser < handle
                 %       true
                 obj.fs = info.samp_freq/info.timebase;
                 %obj.fs = info.samp_freq;
-            else
+            elseif ~isempty(obj.ochan)
                 %JAH: 6/24/2025 - this may not be correct ...
 
                 temp = obj.ochan.to;

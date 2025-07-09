@@ -57,11 +57,6 @@ classdef raw_object
                 [value,I1,prop_type] = epworks.parse.iom.parse_type(bytes,I1,r,depth,temp_name);
                 prop_types(i) = prop_type;
                 props{i} = value;
-                % try
-                % if value == "AcquisitionTimeZone"
-                %     keyboard
-                % end
-                % end
             end
             obj.prop_types = prop_types;
             obj.props = props;
@@ -116,14 +111,14 @@ classdef raw_object
                         array_indices(i) = index+1;
                     else
                         name = ['x' name];
-                        name = epworks.utils.getSafeVariableName(name);
-                        p.(name) = value;
+                        name2 = epworks.utils.getSafeVariableName(name);
+                        p.(name2) = value;
                     end
                     
                 else
                     %no issues except maybe safety
-                    name = epworks.utils.getSafeVariableName(name);
-                    p.(name) = value;
+                    name2 = epworks.utils.getSafeVariableName(name);
+                    p.(name2) = value;
                 end
             end
 

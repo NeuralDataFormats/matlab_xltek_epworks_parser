@@ -69,9 +69,12 @@ classdef cursor_calc < epworks.p.parse_object
                     case 'ValueType'
                         obj.value_type = value;
                     otherwise
-                        keyboard
+                        safe_name = epworks.utils.getSafeVariableName(cur_name);
+                        obj.unhandled_props.(safe_name) = value;
                 end
             end
+
+            r.logUnhandledProps(obj);
             
         end
     end

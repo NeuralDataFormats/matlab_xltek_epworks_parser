@@ -25,9 +25,12 @@ classdef bin < epworks.p.parse_object
                     case 'LowFreq'
                         obj.low_freq = value;
                     otherwise
-                        keyboard
+                        safe_name = epworks.utils.getSafeVariableName(cur_name);
+                        obj.unhandled_props.(safe_name) = value;
                 end
             end
+
+            r.logUnhandledProps(obj);
             
         end
     end

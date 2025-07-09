@@ -8,14 +8,17 @@ classdef elements < epworks.p.parse_object
     %   epworks.p.test.data.settings.element_layouts.elements.waveform_view
 
     properties
+        csa_spectral_eeg_view
         dsa_spectral_eeg_view
         eeg_waveform_view
         group_dir_view
         history_view
         note_log_view
+        raw_sweep_view
         stim_ctrl_view
         tp_density_spectral_eeg_view
         test_dir_view
+        trend_view
 
         %This is an array ...
         waveform_views
@@ -36,6 +39,8 @@ classdef elements < epworks.p.parse_object
                 cur_name = fn{i};
                 value = p.(cur_name);
                 switch cur_name
+                    case 'CSASpectralEegView'
+                        obj.csa_spectral_eeg_view = epworks.p.iom.test.data.settings.element_layouts.elements.csa_spectral_eeg_view(value,r);
                     case 'DSASpectralEegView'
                         obj.eeg_waveform_view = epworks.p.iom.test.data.settings.element_layouts.elements.dsa_spectral_eeg_view(value,r);
                     case 'EegWaveformView'
@@ -46,12 +51,16 @@ classdef elements < epworks.p.parse_object
                         obj.history_view = epworks.p.iom.test.data.settings.element_layouts.elements.history_view(value,r);
                     case 'NoteLogView'
                         obj.note_log_view = epworks.p.iom.test.data.settings.element_layouts.elements.note_log_view(value,r);
+                    case 'RawSweepView'
+                        obj.raw_sweep_view = epworks.p.iom.test.data.settings.element_layouts.elements.raw_sweep_view(value,r);
                     case 'StimCtrlView'
                         obj.stim_ctrl_view = epworks.p.iom.test.data.settings.element_layouts.elements.stim_ctrl_view(value,r);
-                    case 'TPDensitySpectralEegView'
-                        obj.tp_density_spectral_eeg_view = epworks.p.iom.test.data.settings.element_layouts.elements.tp_density_spectral_eeg_view(value,r);
                     case 'TestDirView'
                         obj.test_dir_view = epworks.p.iom.test.data.settings.element_layouts.elements.test_dir_view(value,r);
+                    case 'TPDensitySpectralEegView'
+                        obj.tp_density_spectral_eeg_view = epworks.p.iom.test.data.settings.element_layouts.elements.tp_density_spectral_eeg_view(value,r);
+                    case 'TrendView'
+                        obj.trend_view = epworks.p.iom.test.data.settings.element_layouts.elements.trend_view(value,r);
                     otherwise
                         cur_name = string(cur_name);
                         if startsWith(cur_name,'WaveformView')
@@ -66,12 +75,14 @@ classdef elements < epworks.p.parse_object
                             view = epworks.p.iom.test.data.settings.element_layouts.elements.waveform_view(value,r);
                             views{index} = view;
                         else
-                            keyboard
+                            safe_name = epworks.utils.getSafeVariableName(cur_name);
+                            obj.unhandled_props.(safe_name) = value;
                         end
                         
                 end
             end
             obj.waveform_views = [views{:}];
+            r.logUnhandledProps(obj);
             
         end
     end

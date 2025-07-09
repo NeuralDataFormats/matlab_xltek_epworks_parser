@@ -1,7 +1,7 @@
-classdef dsa_spectral_eeg_view < epworks.p.parse_object
+classdef csa_spectral_eeg_view < epworks.p.parse_object
     %
     %   Class:
-    %   epworks.p.iom.test.data.settings.element_layouts.elements.dsa_spectral_eeg_view
+    %   epworks.p.iom.test.data.settings.element_layouts.elements.csa_spectral_eeg_view
 
     properties
         friendly_name
@@ -23,10 +23,11 @@ classdef dsa_spectral_eeg_view < epworks.p.parse_object
         spectral_edge_color
         spectral_edge_flag
         spectral_edge_width
+        graph_color
     end
 
     methods
-        function obj = dsa_spectral_eeg_view(s,r)
+        function obj = csa_spectral_eeg_view(s,r)
             r.logObject(obj);
             p = s.props;
             fn = fieldnames(p);
@@ -72,6 +73,8 @@ classdef dsa_spectral_eeg_view < epworks.p.parse_object
                         obj.spectral_edge_flag = value;
                     case 'SpectralEdgeWidth' 
                         obj.spectral_edge_width = value;
+                    case 'GraphColor'
+                        obj.graph_color = value;
                     otherwise
                         safe_name = epworks.utils.getSafeVariableName(cur_name);
                         obj.unhandled_props.(safe_name) = value;

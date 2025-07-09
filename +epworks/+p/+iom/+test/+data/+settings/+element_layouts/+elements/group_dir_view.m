@@ -37,9 +37,12 @@ classdef group_dir_view < epworks.p.parse_object
                         obj.window_title_prefix = value;
 
                     otherwise
-                        keyboard
+                        safe_name = epworks.utils.getSafeVariableName(cur_name);
+                        obj.unhandled_props.(safe_name) = value;
                 end
             end
+
+            r.logUnhandledProps(obj);
 
         end
     end

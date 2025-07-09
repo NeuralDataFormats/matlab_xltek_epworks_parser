@@ -1,4 +1,4 @@
-classdef dsa_spectral_eeg_view < epworks.p.parse_object
+classdef raw_sweep_view < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.iom.test.data.settings.element_layouts.elements.dsa_spectral_eeg_view
@@ -23,10 +23,18 @@ classdef dsa_spectral_eeg_view < epworks.p.parse_object
         spectral_edge_color
         spectral_edge_flag
         spectral_edge_width
+        num_divisions
+        window_name
+        show_rejection_levels
+        show_waveform_labels
+        view_width_in_divisions
+        view_zoom_index
+        view_zoom_select
+        window_placement
     end
 
     methods
-        function obj = dsa_spectral_eeg_view(s,r)
+        function obj = raw_sweep_view(s,r)
             r.logObject(obj);
             p = s.props;
             fn = fieldnames(p);
@@ -72,6 +80,22 @@ classdef dsa_spectral_eeg_view < epworks.p.parse_object
                         obj.spectral_edge_flag = value;
                     case 'SpectralEdgeWidth' 
                         obj.spectral_edge_width = value;
+                    case 'NumDivisions'
+                        obj.num_divisions = value;
+                    case 'WindowName'
+                        obj.window_name = value;
+                    case 'ShowRejectionLevels'
+                        obj.show_rejection_levels = value;
+                    case 'ShowWaveformLabels'
+                        obj.show_waveform_labels = value;
+                    case 'ViewWidthInDivisions'
+                        obj.view_width_in_divisions = value;
+                    case 'ViewZoomIndex'
+                        obj.view_zoom_index = value;
+                    case 'ViewZoomSelect'
+                        obj.view_zoom_select = value;
+                    case 'WindowPlacement'
+                        obj.window_placement = value;
                     otherwise
                         safe_name = epworks.utils.getSafeVariableName(cur_name);
                         obj.unhandled_props.(safe_name) = value;

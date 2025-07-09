@@ -40,16 +40,6 @@ classdef input_channel < epworks.p.parse_object
                 cur_name = fn{i};
                 value = p.(cur_name);
                 switch cur_name
-                    %{
-                    case 'AudioVolume'
-                        obj.audio_volume = double(typecast(s2.raw_data,'uint32'));
-                    case 'Color'
-                        obj.color = double(s2.raw_data);
-                    case 'HffCutoff'
-                        obj.hff_cutoff = typecast(s2.raw_data,'double');
-                    case 'IsAlarmedWave'
-                        obj.is_alarmed_wave = double(typecast(s2.raw_data,'uint32'));
-                    %}
                     case 'ChannelId'
                         obj.channel_id = value;
                     case 'DefinitionId'
@@ -63,9 +53,12 @@ classdef input_channel < epworks.p.parse_object
                     case 'TypeId' 
                         obj.type_id = value;
                     otherwise
-                        keyboard
+                        safe_name = epworks.utils.getSafeVariableName(cur_name);
+                        obj.unhandled_props.(safe_name) = value;
                 end
             end
+
+            r.logUnhandledProps(obj);
             
         end
     end

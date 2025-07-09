@@ -35,6 +35,13 @@ classdef data < epworks.p.parse_object
 
     methods
         function obj = data(s,r)
+            %
+            %   Inputs
+            %   ------
+            %   s : struct
+            %   r :
+
+
             r.logObject(obj);
             p = s.props;
             fn = fieldnames(p);
@@ -83,9 +90,13 @@ classdef data < epworks.p.parse_object
                     case 'LastRecordedSetNumber'
                         obj.last_recorded_set_number = value;
                     otherwise
-                        keyboard
+                        safe_name = epworks.utils.getSafeVariableName(cur_name);
+                        obj.unhandled_props.(safe_name) = value;
                 end
             end
+
+            r.logUnhandledProps(obj);
+
         end
     end
 end

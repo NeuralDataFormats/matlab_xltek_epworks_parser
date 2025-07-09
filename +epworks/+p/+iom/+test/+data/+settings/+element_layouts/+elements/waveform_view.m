@@ -2,6 +2,15 @@ classdef waveform_view < epworks.p.parse_object
     %
     %   Class:
     %   epworks.p.test.data.settings.element_layouts.elements.waveform_view
+    %
+    %
+    %   Structure
+    %   ---------
+    %   - electrodes
+    %       - elements
+    %           - views
+    %
+    %   ??? What links the electrodes to waveforms?
 
     properties
         p
@@ -18,10 +27,12 @@ classdef waveform_view < epworks.p.parse_object
         baseline_color
         cursor_color
         cursor_range_color
+        cursor_view_abs_rel_ratio
+        cursor_view
         grid_color
         group_splitting
         groups_count
-        groups0
+        groups
         hide_cursor_labels
         label_color
         locked_on_live
@@ -31,6 +42,7 @@ classdef waveform_view < epworks.p.parse_object
         num_waves_in_replace
         only_show_selected_waved_labels
         removed_traces_count
+        removed_traces
         set_spacing
         show_cursors
         show_trace_set_labels
@@ -38,18 +50,19 @@ classdef waveform_view < epworks.p.parse_object
         split_gain
         trace_spacing
         traces_count
-        wave_x_spacing
-        wave_y_spacing
-        window_name
-        cursor_view_abs_rel_ratio
-        cursor_view
+        
+        traces
+        %This is an array ...
+
         view_width_in_divisions
         view_zoom_index
         view_zoom_select
+        wave_x_spacing
+        wave_y_spacing
+        window_name
         window_placement
 
-        %This is an array ...
-        traces
+        
     end
 
     methods
@@ -63,6 +76,10 @@ classdef waveform_view < epworks.p.parse_object
             temp = regexp(fn,'^Traces_\d','once');
             n_traces = sum(~cellfun('isempty',temp));
             traces = cell(1,n_traces);
+
+            temp = regexp(fn,'^Groups_\d','once');
+            n_groups = sum(~cellfun('isempty',temp));
+            groups = cell(1,n_groups);
             for i = 1:length(fn)
                 cur_name = fn{i};
                 value = p.(cur_name);
@@ -97,8 +114,8 @@ classdef waveform_view < epworks.p.parse_object
                         obj.group_splitting = value;
                     case 'Groups_Count'
                         obj.groups_count = value;
-                    case 'Groups_0_'
-                        obj.groups0 = epworks.p.iom.test.data.settings.element_layouts.elements.groups(value,r);
+                    %case 'Groups_0_'
+                    %    obj.groups0 = epworks.p.iom.test.data.settings.element_layouts.elements.groups(value,r);
                     case 'HideCursorLabels'
                         obj.hide_cursor_labels = value;
                     case 'LabelColor'
@@ -129,29 +146,6 @@ classdef waveform_view < epworks.p.parse_object
                         obj.split_gain = value;
                     case 'TraceSpacing'
                         obj.trace_spacing = value;
-                    % case 'Traces_0_'
-                    %     obj.traces0 = epworks.p.iom.test.data.settings.element_layouts.elements.traces(value,r);
-                    % case 'Traces_1_'
-                    %     obj.traces1 = epworks.p.iom.test.data.settings.element_layouts.elements.traces(value,r);
-                    % case 'Traces_2_'
-                    %     obj.traces2 = epworks.p.iom.test.data.settings.element_layouts.elements.traces(value,r);
-                    % case 'Traces_3_'
-                    %     obj.traces3 = epworks.p.iom.test.data.settings.element_layouts.elements.traces(value,r);
-                    % case 'Traces_4_'
-                    %     obj.traces4 = epworks.p.iom.test.data.settings.element_layouts.elements.traces(value,r);
-                    % case 'Traces_5_'
-                    %     obj.traces5 = epworks.p.iom.test.data.settings.element_layouts.elements.traces(value,r);
-                    % case 'Traces_6_'
-                    %     obj.traces6 = epworks.p.iom.test.data.settings.element_layouts.elements.traces(value,r);
-                    % case 'Traces_7_'
-                    %     obj.traces7 = epworks.p.iom.test.data.settings.element_layouts.elements.traces(value,r);
-                    % case 'Traces_8_'
-                    %     obj.traces8 = epworks.p.iom.test.data.settings.element_layouts.elements.traces(value,r);
-                    % case 'Traces_9_'
-                    %     obj.traces9 = epworks.p.iom.test.data.settings.element_layouts.elements.traces(value,r);
-                    % case 'Traces_10_'
-                    %     obj.traces10 = epworks.p.iom.test.data.settings.element_layouts.elements.traces(value,r);
-
                     case 'Traces_Count'
                         obj.traces_count = value;
                     case 'WaveXSapcing'
@@ -180,13 +174,27 @@ classdef waveform_view < epworks.p.parse_object
                             index = str2double(temp) + 1;
                             trace = epworks.p.iom.test.data.settings.element_layouts.elements.traces(value,r);
                             traces{index} = trace;
+                        elseif startsWith(cur_name, 'RemovedTraces')
+                            %This may need object parsing but good enough
+                            %for now
+                            obj.removed_traces = value;
+                        elseif startsWith(cur_name,'Groups')
+                            temp = regexp(cur_name,'\d+','once','match');
+                            %Note, they start at 0
+                            index = str2double(temp) + 1;
+                            group = epworks.p.iom.test.data.settings.element_layouts.elements.groups(value,r);
+                            groups{index} = group;   
                         else
-                            keyboard
+                            safe_name = epworks.utils.getSafeVariableName(cur_name);
+                            obj.unhandled_props.(safe_name) = value;
                         end
                         
                 end
             end
             obj.traces = [traces{:}];
+            obj.groups = [groups{:}];
+            r.logUnhandledProps(obj);
+
         end
         function childrenToProps(obj,logger)
             if ~isempty(obj.traces)

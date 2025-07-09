@@ -10,6 +10,7 @@ classdef eeg_waveform < epworks.objects.result_object
     %   epworks.objects.signal
     %   epworks.objects.triggered_waveform
     %   epworks.objects.freerun_waveform
+    %   epworks.p.re    
 
     properties (Hidden)
         id_props = {'parent','trace'}
@@ -18,6 +19,7 @@ classdef eeg_waveform < epworks.objects.result_object
     
     properties
         name
+        group_name
         lff_cutoff
         hff_cutoff
         notch_cutoff
@@ -100,6 +102,12 @@ classdef eeg_waveform < epworks.objects.result_object
             %   Note, there is a discrepancy between this and what is
             %   shown in the appplication - need to access:
             %   f.tests.raw_settings.eeg.applied_montage_key_tree.channels
+            %
+            %   Improvements
+            %   ------------
+            %   1. May want to return as an object with extra meta 
+            %   info that allows nice plotting (stacking) like the
+            %   triggered and freerun waveforms
 
             arguments
                 obj epworks.objects.eeg_waveform
@@ -108,6 +116,13 @@ classdef eeg_waveform < epworks.objects.result_object
                 in.time_format {mustBeMember(in.time_format,{'datetime','numeric','none'})} = 'datetime';
                 in.notch_width (1,1) {mustBeNumeric} = 20
                 in.notch_order (1,1) {mustBeNumeric} = 8
+                %I grabbed these from the defaults settings ...
+                %
+                %   Under, customize -> waveforms
+                %
+                %Not sure where to find if they have been updated
+                in.hff_order (1,1) {mustBeNumeric} = 4
+                in.lff_order (1,1) {mustBeNumeric} = 2
             end
 
             s = struct();
@@ -155,6 +170,14 @@ classdef eeg_waveform < epworks.objects.result_object
                     s.time = [];
             end
 
+        end
+    end
+    methods (Hidden)
+        function processPostLinking(objs)
+            for i = 1:length(objs)
+                obj = objs(i);
+                obj.group_name = obj.trace.group_name;
+            end
         end
     end
 end

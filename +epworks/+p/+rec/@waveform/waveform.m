@@ -17,7 +17,7 @@ classdef waveform < epworks.p.parse_object
         trace_id
         ochan_id
         all_bytes
-        first_600
+        first_888
         timestamp
         id
         data
@@ -176,7 +176,30 @@ classdef waveform < epworks.p.parse_object
             %
             %73:88 = always 0
             %
-            % 89:104 - trace_id
+            %   It is unclear how to know if we should expect values here
+            %   or not, and if so, how many to expect.
+            %
+            %   In some cases the format seems to be:
+            %       - 16 bytes (unknown format)
+            %       - 8 byte double
+            %       - 8 byte double
+            %       - repeats
+            %
+            %
+            % 89:104 not a double, a 16 byte value? two 8 byte values?
+            %       I could not find any ID info, but I am not sure I
+            %       looked that hard (e.g., try and find this string in the
+            %       iom raw byte data)
+            %
+            %       **** In one case 89:96 is a timestamp (not sure if that
+            %       is for eeg or what)
+            %
+            %       In the below examples I think n indicates how many
+            %       impossibly large double values were observed. Thus 
+            %       a low n indicates it is probably a double (with some
+            %       sort of conditional as to whether or not to use the
+            %       value),
+            %
             % 105:112, n=13 (likely a double)
             % 113:120, n=36 (likely a double)
             % 121:128, n=2  (likely a double)
@@ -219,7 +242,7 @@ classdef waveform < epworks.p.parse_object
 
             
 
-            obj.first_600 = bytes(1:600);
+            obj.first_888 = bytes(1:888);
 
             %obj.b89 = bytes(89:96);
             obj.timestamp2 = epworks.utils.processType3time(bytes(89:96));

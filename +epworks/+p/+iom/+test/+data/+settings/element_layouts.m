@@ -1,7 +1,7 @@
 classdef element_layouts < epworks.p.parse_object
     %
     %   Class:
-    %   epworks.p.test.data.settings.cursor_calc
+    %   epworks.p.iom.test.data.settings.element_layouts
 
     properties
         elements
@@ -42,9 +42,12 @@ classdef element_layouts < epworks.p.parse_object
                     case 'Name'
                         obj.name = value;
                     otherwise
-                        keyboard
+                        safe_name = epworks.utils.getSafeVariableName(cur_name);
+                        obj.unhandled_props.(safe_name) = value;
                 end
             end
+
+            r.logUnhandledProps(obj);
             
         end
     end

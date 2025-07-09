@@ -51,9 +51,12 @@ classdef freerun_waveform < epworks.p.parse_object
                     case 'Type'
                         obj.type = value;
                     otherwise
-                        keyboard
+                        safe_name = epworks.utils.getSafeVariableName(cur_name);
+                        obj.unhandled_props.(safe_name) = value;
                 end
             end
+
+            r.logUnhandledProps(obj);
 
 
         end

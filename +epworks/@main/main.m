@@ -69,6 +69,11 @@ classdef main < epworks.RNEL.handle_light
     %   which REC files this applies to.
     %   6. There are some redundant IDs with cursor_calc and cursor_def.
     %   It is not clear why the ID is showing more than once.
+    %
+    %
+    %   See Also
+    %   --------
+    %   epworks.parse.main
 
     properties (Hidden)
         s %This is a structure that holds all of the top level parsed
@@ -269,9 +274,17 @@ classdef main < epworks.RNEL.handle_light
             obj.groups.processPostLinking(obj.tests(1),options);
             
             %epworks.objects.trace
-            obj.traces.processPostLinking();
+            obj.traces.processPostLinking(obj.tests(1));
 
             obj.sets.processPostLinking();
+
+            if ~isempty(obj.freerun_waveforms)
+                obj.freerun_waveforms.processPostLinking();
+            end
+
+            if ~isempty(obj.eeg_waveforms)
+                obj.eeg_waveforms.processPostLinking();
+            end
 
             %Adding group name for triggered waveforms
             %--------------------------------------------------------------
@@ -292,15 +305,19 @@ classdef main < epworks.RNEL.handle_light
             %   TW: set, epworks.objects.triggered_waveform
 
             tw = obj.triggered_waveforms_unsorted;
-
-            tw__set_number = [tw.set_number];
-            tw__group_name = {tw.group_name};
-
-            for i = 1:length(obj.sets)
-                mask = obj.sets(i).set_number == tw__set_number & ...
-                    strcmp(obj.sets(i).group_name,tw__group_name);
-                if any(mask)
-                    obj.sets(i).triggered_waveforms = tw(mask);
+            if ~isempty(tw)
+                tw__set_number = [tw.set_number];
+                tw__group_name = {tw.group_name};
+    
+                for i = 1:length(obj.sets)
+                    mask = obj.sets(i).set_number == tw__set_number & ...
+                        strcmp(obj.sets(i).group_name,tw__group_name);
+                    if any(mask)
+                        temp = tw(mask);
+                        origin_y = [temp.origin_y];
+                        [~,I] = sort(origin_y);
+                        obj.sets(i).triggered_waveforms = temp(I);
+                    end
                 end
             end
 
@@ -316,20 +333,22 @@ classdef main < epworks.RNEL.handle_light
             %   and all groups. Often though I think you want to first
             %   narrow in on a specific set or trace. This helps with
             %   narrowing by trace. Above we narrowed by set.
-            
-            tw_trace_ids = vertcat(obj.triggered_waveforms_unsorted.trace_id);
-            [~,ia,ic] = unique(tw_trace_ids,'rows');
-            n_unique = length(ia);
-            tw_groups_cell = cell(n_unique,1);
-            for i = 1:length(ia)
-                tw_groups_cell{i} = epworks.objects.triggered_waveform_group(...
-                    obj.triggered_waveforms_unsorted(i == ic));
 
-                temp = tw_groups_cell{i};
-                temp.group_name = temp.group_name;
+            if ~isempty(obj.triggered_waveforms_unsorted)
+                tw_trace_ids = vertcat(obj.triggered_waveforms_unsorted.trace_id);
+                [~,ia,ic] = unique(tw_trace_ids,'rows');
+                n_unique = length(ia);
+                tw_groups_cell = cell(n_unique,1);
+                for i = 1:length(ia)
+                    tw_groups_cell{i} = epworks.objects.triggered_waveform_group(...
+                        obj.triggered_waveforms_unsorted(i == ic));
+    
+                    temp = tw_groups_cell{i};
+                    temp.group_name = temp.group_name;
+                end
+    
+                obj.triggered_waveforms = [tw_groups_cell{:}];
             end
-
-            obj.triggered_waveforms = [tw_groups_cell{:}];
 
             %Linking of data to the traces
             %--------------------------------------------------------------
@@ -339,56 +358,49 @@ classdef main < epworks.RNEL.handle_light
             %   - freerun_waveforms
             %   - eeg_waveforms
 
-            tw_trace_ids = vertcat(obj.triggered_waveforms.trace_id);
-            eeg_trace_ids = vertcat(obj.eeg_waveforms.trace_id);
-            fr_trace_ids = vertcat(obj.freerun_waveforms.trace_id);
+            if ~isempty(obj.triggered_waveforms)
+                tw_trace_ids = vertcat(obj.triggered_waveforms.trace_id);
+            end
+
+            if ~isempty(obj.eeg_waveforms)
+                eeg_trace_ids = vertcat(obj.eeg_waveforms.trace_id);
+            end
+
+            if ~isempty(obj.freerun_waveforms)
+                fr_trace_ids = vertcat(obj.freerun_waveforms.trace_id);
+            end
+            
             trace_ids = vertcat(obj.traces.id);
             for i = 1:size(trace_ids,1)
                 cur_trace_id = trace_ids(i,:);
-                mask = ismember(tw_trace_ids,cur_trace_id,'rows');
-                if any(mask)
-                    obj.traces(i).triggered_waveforms = obj.triggered_waveforms(mask);
+
+                if ~isempty(obj.triggered_waveforms)
+                    mask = ismember(tw_trace_ids,cur_trace_id,'rows');
+                    if any(mask)
+                        obj.traces(i).triggered_waveforms = obj.triggered_waveforms(mask);
+                    end
                 end
 
-                mask = ismember(fr_trace_ids,cur_trace_id,'rows');
-                if any(mask)
-                    obj.traces(i).freerun_waveforms = obj.freerun_waveforms(mask);
+                if ~isempty(obj.freerun_waveforms)
+                    mask = ismember(fr_trace_ids,cur_trace_id,'rows');
+                    if any(mask)
+                        if sum(mask) > 1
+                            error('Assumption violated, see snippet_group code')
+                        end
+                        obj.traces(i).freerun_waveforms = obj.freerun_waveforms(mask);
+                    end
                 end
 
-                mask = ismember(eeg_trace_ids,cur_trace_id,'rows');
-                if any(mask)
-                    obj.traces(i).eeg_waveforms = obj.eeg_waveforms(mask);
+                if ~isempty(obj.eeg_waveforms)
+                    mask = ismember(eeg_trace_ids,cur_trace_id,'rows');
+                    if any(mask)
+                        if sum(mask) > 1
+                            error('Assumption violated, see snippet_group code')
+                        end
+                        obj.traces(i).eeg_waveforms = obj.eeg_waveforms(mask);
+                    end
                 end
             end
-
-
-
-            %Need to align by:
-            %1) Set #
-            %2) Group ID
-
-
-
-
-
-            %After linking processing
-            %--------------------------------------------------------------
-            %Note, I'm currently assuming only 1 test ...
-            %ASSUMPTION
-            
-
-
-            %Some additional info population
-            %
-            %   Note, if we rearrange things we should update this as
-            %   the tables show index order.
-
-            %TODO: Move this back into this parent class, too hidden
-            %obj.info = epworks.main.table_info(obj);
-
-
-            %Info
-            %---------------------------------------------------------
 
             %Group Info
             %----------------------------------------------------------
@@ -397,23 +409,100 @@ classdef main < epworks.RNEL.handle_light
             %TODO: Move this as method to group class
             index = (1:n_groups)';
             name = string({groups.name}');
-            is_eeg_group = [groups.is_eeg_group]';
+            is_eeg = [groups.is_eeg_group]';
             state = [groups.state]';
             signal_type = [groups.signal_type]';
             sweeps_per_avg = [groups.sweeps_per_avg]';
             trigger_delay = [groups.trigger_delay]';
             n_sets = zeros(n_groups,1);
             n_traces = zeros(n_groups,1);
+            has_free = zeros(n_groups,1);
+            has_trig = zeros(n_groups,1);
             for i = 1:n_groups
-                n_sets(i) = length(groups(i).sets);
-                n_traces(i) = length(groups(i).traces);
+                group = groups(i);
+                n_sets(i) = length(group.sets);
+                n_traces(i) = length(group.traces);
+                traces = group.traces;
+                for j = 1:length(traces)
+                    trace = traces(j);
+                    if ~isempty(trace.freerun_waveforms)
+                        has_free(i) = has_free(i) + 1;
+                    end
+                    if ~isempty(trace.triggered_waveforms)
+                        has_trig(i) = has_trig(i)+1;
+                    end
+                end
             end
 
-            obj.group_info = table(index,name,n_sets,n_traces,is_eeg_group,state,signal_type,sweeps_per_avg,trigger_delay);
+            obj.group_info = table(index,name,n_sets,n_traces,...
+                is_eeg,has_free,has_trig,state,signal_type,...
+                sweeps_per_avg,trigger_delay);
 
-            % % obj.triggered_info = h__getWaveformInfo(obj.triggered_waveforms);
-            % % obj.freerun_info = h__getWaveformInfo(obj.freerun_waveforms);
-            % % obj.eeg_info = h__getWaveformInfo(obj.eeg_waveforms);
+            %TW Info
+            %--------------------------------------------------------------
+            %
+            %   - name
+            %   - group_name
+            %   - n_sets
+            %   
+
+            if ~isempty(obj.triggered_waveforms)
+                index = (1:length(obj.triggered_waveforms))';
+                name = {obj.triggered_waveforms.name}';
+                group_name = {obj.triggered_waveforms.group_name}';
+                n_sets = [obj.triggered_waveforms.n_sets]';
+    
+                temp = table(index,name,group_name,n_sets);
+    
+                [temp2,I] = sortrows(temp,["group_name","name"]);
+                obj.triggered_waveforms = obj.triggered_waveforms(I);
+                obj.triggered_info = temp2;
+                obj.triggered_info.index = (1:height(temp2))';
+            end
+
+            %Freerun Info
+            %--------------------------------------------------------------
+            %
+            %   - name
+            %   - group_name
+            %   - n_snippets
+            %
+
+            if ~isempty(obj.freerun_waveforms)
+                index = (1:length(obj.freerun_waveforms))';
+                name = {obj.freerun_waveforms.name}';
+                group_name = {obj.freerun_waveforms.group_name}';
+                n_snippets = [obj.freerun_waveforms.n_snippets]';
+    
+                temp = table(index,name,group_name,n_snippets);
+    
+                [temp2,I] = sortrows(temp,["group_name","name"]);
+                obj.freerun_waveforms = obj.freerun_waveforms(I);
+                obj.freerun_info = temp2;
+                obj.freerun_info.index = (1:height(temp2))';
+            end
+
+
+            %EEG Waveform Info
+            %--------------------------------------------------------------
+            %
+            %   - name
+            %   - group_name
+            %   - n_snippets
+            %
+
+            index = (1:length(obj.eeg_waveforms))';
+            name = {obj.eeg_waveforms.name}';
+            group_name = {obj.eeg_waveforms.group_name}';
+            n_snippets = [obj.eeg_waveforms.n_snippets]';
+
+            temp = table(index,name,group_name,n_snippets);
+
+            [temp2,I] = sortrows(temp,["group_name","name"]);
+            obj.eeg_waveforms = obj.eeg_waveforms(I);
+            obj.eeg_info = temp2;
+            obj.eeg_info.index = (1:height(temp2))';
+
 
             %--------------------------------------------------------------
 

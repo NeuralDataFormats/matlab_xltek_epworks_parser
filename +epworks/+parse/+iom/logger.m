@@ -34,12 +34,15 @@ classdef logger < handle
         % 4 : array?
         % 5 : object
         % 6 : GUIds???
+
+        unhandled_props
     end
 
     methods
         function obj = logger()
             obj.id_tracker = epworks.parse.id_tracker;
             obj.id_tracker2 = epworks.parse.id_tracker;
+            obj.unhandled_props = {};
         end
         function initializeObjectHolder(obj)
             obj.logged_objects = cell(1,obj.first_past_object_count);
@@ -57,6 +60,13 @@ classdef logger < handle
         end
         function logUnknownID(obj,description,id)
             obj.id_tracker2.logID(description,id);
+        end
+        function logUnhandledProps(obj,new_obj)
+            %Called by data classes. They should have an unhandled_props
+            %property.
+            if ~isempty(new_obj.unhandled_props)
+                obj.unhandled_props = [obj.unhandled_props; {class(new_obj) new_obj.unhandled_props}];
+            end
         end
         function doObjectLinking(obj)
             %

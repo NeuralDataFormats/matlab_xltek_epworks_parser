@@ -17,6 +17,7 @@ classdef data < epworks.p.parse_object
         %This is probably wrong
         iom32_noise_spectrum_number_of_bins
         iom32_stim_reset_required
+        recover_test
         settings
         simulation_mode
         state
@@ -47,6 +48,8 @@ classdef data < epworks.p.parse_object
                         obj.iom32_noise_spectrum_number_of_bins = value;
                     case 'IOM32StimResetRequired'
                         obj.iom32_stim_reset_required = value;
+                    case 'RecoverTest'
+                        obj.recover_test = value;
                     case 'Settings'
                         obj.settings = epworks.p.iom.test.data.settings(value,r);
                     case 'SimulationMode'
@@ -60,10 +63,13 @@ classdef data < epworks.p.parse_object
                     case 'VersionInfo'
                         obj.version_info = epworks.p.iom.test.version_info(value,r);
                     otherwise
-                        keyboard
+                        safe_name = epworks.utils.getSafeVariableName(cur_name);
+                        obj.unhandled_props.(safe_name) = value;
                 end
             end
             
+            r.logUnhandledProps(obj);
+
         end
     end
 end

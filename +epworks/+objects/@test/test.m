@@ -47,5 +47,22 @@ classdef test < epworks.objects.result_object
             %obj.parent = p.parent.id;
             obj.groups = {p.groups.id};
         end
+        function t = getOchanTable(obj)
+
+            o_chans = obj.settings.raw.o_chans;
+            %i_chans = obj.settings.raw.i_chans;
+
+            o_chan_name = {o_chans.name}';
+            n_o_chans = length(o_chans);
+            o_chan_group_names = cell(n_o_chans,1);
+            left_gain = [o_chans.left_display_gain]';
+            right_gain = [o_chans.right_display_gain]';
+            for i = 1:n_o_chans
+                o_chan_group_names{i} = o_chans(i).group_def.name;
+            end
+
+            index = (1:n_o_chans)';
+            t = table(index,o_chan_name,o_chan_group_names,left_gain,right_gain);
+        end
     end
 end

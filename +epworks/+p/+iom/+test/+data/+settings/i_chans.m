@@ -1,10 +1,10 @@
 classdef i_chans < epworks.p.parse_object
     %
     %   Class:
-    %   epworks.p.iom.test.data.settings.cursor_calc
+    %   epworks.p.iom.test.data.settings.i_chans
 
     properties (Hidden)
-        id_props = {'montage_chan_id'}
+        id_props = {'active_electrode','montage_chan_id','ref_electrode'}
     end   
 
     properties
@@ -83,9 +83,12 @@ classdef i_chans < epworks.p.parse_object
                     case 'ThresholdDelay'
                         obj.threshold_delay = value;
                     otherwise
-                        keyboard
+                        safe_name = epworks.utils.getSafeVariableName(cur_name);
+                        obj.unhandled_props.(safe_name) = value;
                 end
             end
+
+            r.logUnhandledProps(obj);
             
         end
     end

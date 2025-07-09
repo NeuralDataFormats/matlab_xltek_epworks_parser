@@ -1,7 +1,7 @@
 classdef settings < epworks.p.parse_object
     %
     %   Class:
-    %   epworks.p.test.settings
+    %   epworks.p.iom.tests.data.settings
 
     properties (Hidden)
         id_props = {'active_layout'}
@@ -99,9 +99,12 @@ classdef settings < epworks.p.parse_object
                     case 'TrendSets'
                         obj.trendsets = value;
                     otherwise
-                        keyboard
+                        safe_name = epworks.utils.getSafeVariableName(cur_name);
+                        obj.unhandled_props.(safe_name) = value;
                 end
             end
+
+            r.logUnhandledProps(obj);
             
         end
     end

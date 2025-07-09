@@ -19,7 +19,6 @@ classdef spt_parser < handle
                 return
             end
             r = epworks.sl.io.fileRead(file_path,'*uint8');
-            % keyboard
             % 53431
             % 56091
             % 58751

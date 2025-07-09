@@ -3,6 +3,9 @@ classdef triggered_waveform < epworks.objects.result_object
     %   Class:
     %   epworks.objects.triggered_waveform
     %
+    %   Note this is exposed to the user in the class:
+    %   epworks.objects.triggered_waveform_group
+    %
     %   This primarily holds the info for the stimulation.
     %
     %   It also holds the data but I need to fix some redundancy issues
@@ -74,7 +77,7 @@ classdef triggered_waveform < epworks.objects.result_object
         fs = NaN
         n_samples = 0
 
-        source_data
+        source_data %What is this?
 
         n_children
 
@@ -86,6 +89,7 @@ classdef triggered_waveform < epworks.objects.result_object
         set_number
         trace_id
         time
+        origin_y
     end
 
     methods
@@ -111,6 +115,13 @@ classdef triggered_waveform < epworks.objects.result_object
             else
                 n_m_1 = length(obj.data) - 1;
                 value = obj.t0 + seconds((0:n_m_1)/obj.fs);
+            end
+        end
+        function value = get.origin_y(obj)
+            if isempty(obj.trace)
+                value = 0;
+            else
+                value = obj.trace.origin_y;
             end
         end
     end
@@ -169,6 +180,24 @@ classdef triggered_waveform < epworks.objects.result_object
             %   s : struct
             %       .h_plot
             %       .h_label
+            %
+            %   Optional Inputs
+            %   ---------------
+            %   spacing:
+            %     -'file' from file
+            %     -'data' from data - note, this becomes hard across sets
+            %           (NYI)
+            %    - scalar - scaling proportional to file
+            %       > 1 - more spacing
+            %       < 1 - less spacing
+            %       e.g., 2 is twice as much spacing as estimated from file
+            %
+            %    - numeric array - hardcoded offsets for each channel
+            %    - [] - everything level but with legend (legend NYI)
+            %
+            %   See Also
+            %   --------
+            %   epworks.objects.set
 
             arguments
                 objs
@@ -176,41 +205,118 @@ classdef triggered_waveform < epworks.objects.result_object
                 options.filter = false; %NYI
                 options.add_chan_label = true;
                 options.reverse_y = true;
+
+                %Spacing options
+                %---------------
+                %NYI
+                %- 'file' from file
+                %- 'data' from data - note, this becomes hard across sets
+                %           (NYI)
+                %- #### - scaling based on file
+                %       - use 1 as default for easier interpretation
+                %- array - hardcoded offsets
+                %- [] - everything level but with legend (legend NYI)
+
+                options.spacing = 'file';
+                options.clear_axes = true;
+
+                %For 
+                options.color = []; %NYI
             end
 
             n_objs = length(objs);
 
             %TODO: Check that we have duration on x axis
 
-            origin_y = zeros(n_objs,1);
+
+            if strcmpi(options.spacing,'file') || ...
+                    (isnumeric(options.spacing) && isscalar(options.spacing))
+                %For display gain I only want to change the spacing, not
+                %the actual scaling on the plot
+                %
+                %   These are ideally equivalent. By reducing spacing we make
+                %   each signal larger on the plot (for a given y-range)
+
+                if strcmpi(options.spacing,'file') 
+                    k = 1;
+                else
+                    k = options.spacing;
+                end
+
+                origin_y2 = [objs.origin_y];
+                left_disp_gains = zeros(1,n_objs);
+                for i = 1:length(objs)
+                    obj = objs(i);
+                    try
+                        left_disp_gains(i) = obj.trace.o_chan.left_display_gain;
+                    end
+                end
+    
+                left_disp_gain_avg = median(left_disp_gains,'omitmissing');
+                if isnan(left_disp_gain_avg)
+                    left_disp_gain_avg = 1;
+                end
+    
+                %This 0.5 and /50 is approximate. As you change the 
+                %plot size in the program these change. But in general this
+                %gets us pretty close.
+                %
+                %   This may be in the waveform views:
+                %   epworks.p.test.data.settings.element_layouts.elements.waveform_view
+                origin_y2 = k*0.50*origin_y2*left_disp_gain_avg/50;
+            elseif strcmpi(options.spacing,'data')
+                error('Not yet implemented')
+            elseif length(options.spacing) == n_objs
+                origin_y2 = options.spacing;
+            elseif isempty(options.spacing)
+                origin_y2 = zeros(n_objs,1);
+            else
+                error('Unrecognized spacing option')
+            end
 
             %We could eventually update this
             ax = gca;
+            if options.clear_axes
+                cla(ax);
+            end
 
             s = struct;
             h_plot = struct;
             hold(ax,"on")
             for i = 1:length(objs)
                 obj = objs(i);
+                safe_name = epworks.utils.getSafeVariableName(obj.name);
                 %What does a origin_x shift mean???
                 x = obj.time;
-                switch options.time_units
-                    case "datetime"
-                        %done
-                    case "duration"
-                        %Without this the labeling was not great
-                        x = x - x(1);
-                        if x(end) < seconds(1)
-                            x = milliseconds(milliseconds(x));
-                        end
-                    case "numeric"
-                        x = seconds(x - x(1));
+                if isempty(x)
+                    h_temp = [];
+                else
+                    switch options.time_units
+                        case "datetime"
+                            %done
+                        case "duration"
+                            %Without this the labeling was not great
+                            x = x - x(1);
+                            if x(end) < seconds(1)
+                                x = milliseconds(milliseconds(x));
+                            end
+                        case "numeric"
+                            x = seconds(x - x(1));
+                    end
+
+                    y = obj.data + origin_y2(i);
+
+                    color_options = {};
+                    if isstruct(options.color) && isfield(options.color,safe_name)
+                        color2 = options.color.(safe_name);
+                        color_options = {'color' color2};
+                    end
+                    h_temp = plot(x,y,color_options{:});
+
                 end
 
-                h_temp = plot(x,obj.data+obj.trace.origin_y);
-                safe_name = epworks.utils.getSafeVariableName(obj.name);
+                
                 h_plot.(safe_name) = h_temp;
-                origin_y(i) = obj.trace.origin_y;
             end
             hold(ax,"off")
 
@@ -220,20 +326,19 @@ classdef triggered_waveform < epworks.objects.result_object
             
             
 
-            %Labels - do this after all plots to establish limits
+            %Labels - do this after all plots to establish x limits
             %--------------------------------------------------------------
             xlim = ax.XLim;
 
             h_label = struct;
             for i = 1:length(objs)
                 obj = objs(i);
-                yval = obj.trace.origin_y;
-                h_temp = text(xlim(1), yval, obj.name, ...
+                y_val = origin_y2(i);
+                h_temp = text(xlim(1), y_val, obj.name, ...
                     'VerticalAlignment', 'bottom', ...
                     'HorizontalAlignment', 'left');
                 safe_name = epworks.utils.getSafeVariableName(obj.name);
                 h_label.(safe_name) = h_temp;
-
             end
 
             s.h_plot = h_plot;

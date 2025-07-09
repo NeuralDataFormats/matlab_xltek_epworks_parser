@@ -38,9 +38,12 @@ classdef eeg_waveform_view < epworks.p.parse_object
                     case 'WindowTitlePrefix'
                         obj.window_title_prefix = value;
                     otherwise
-                        keyboard
+                        safe_name = epworks.utils.getSafeVariableName(cur_name);
+                        obj.unhandled_props.(safe_name) = value;
                 end
             end
+
+            r.logUnhandledProps(obj);
             
         end
     end

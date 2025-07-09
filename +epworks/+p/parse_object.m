@@ -6,7 +6,7 @@ classdef parse_object < handle
     %   This is the main class that parsed objects inherit from.
     
     properties
-        
+        unhandled_props
     end
 
     %{

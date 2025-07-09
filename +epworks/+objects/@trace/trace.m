@@ -26,6 +26,9 @@ classdef trace < epworks.objects.result_object
         eeg_waveforms
         triggered_waveforms
         freerun_waveforms
+
+        o_chan
+        i_chan
     end
 
     methods
@@ -44,11 +47,17 @@ classdef trace < epworks.objects.result_object
 
             obj.parent = p.parent.id;
 
+            obj.o_chan = p.data.o_chan;
+            if ~isempty(obj.o_chan)
+                obj.i_chan = p.data.o_chan.to;
+            end
         end
-        function processPostLinking(objs)
+        function processPostLinking(objs,test)
             %
             %   - populate parent name
-            %   
+            
+
+
             for i = 1:length(objs)
                 obj = objs(i);
                 obj.group_name = obj.parent.name;

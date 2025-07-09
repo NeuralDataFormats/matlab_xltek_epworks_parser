@@ -41,9 +41,12 @@ classdef tp_density_spectral_eeg_view < epworks.p.parse_object
                     case 'PowerMax'
 
                     otherwise
-                        keyboard
+                        safe_name = epworks.utils.getSafeVariableName(cur_name);
+                        obj.unhandled_props.(safe_name) = value;
                 end
             end
+
+            r.logUnhandledProps(obj);
             
         end
     end

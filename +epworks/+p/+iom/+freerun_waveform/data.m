@@ -37,10 +37,18 @@ classdef data < epworks.p.parse_object
         trigger_delay
         ui_settings
         visibile
+        visibility
+        sourcedata
+        explicitsave
     end
 
     methods
         function obj = data(s,r)
+
+            arguments
+                s struct
+                r epworks.parse.iom.logger
+            end
             r.logObject(obj);
             p = s.props;
             fn = fieldnames(p);
@@ -98,10 +106,19 @@ classdef data < epworks.p.parse_object
                         obj.ui_settings = value;
                     case 'Visible'         
                         obj.visibile = value;
+                    case 'Visibility'
+                        obj.visibility = value;
+                    case 'SourceData'
+                        obj.sourcedata = value;
+                    case 'ExplicitSave'
+                        obj.explicitsave = value;
                     otherwise
-                        keyboard
+                        safe_name = epworks.utils.getSafeVariableName(cur_name);
+                        obj.unhandled_props.(safe_name) = value;
                 end
             end
+
+            r.logUnhandledProps(obj);
             
         end
     end

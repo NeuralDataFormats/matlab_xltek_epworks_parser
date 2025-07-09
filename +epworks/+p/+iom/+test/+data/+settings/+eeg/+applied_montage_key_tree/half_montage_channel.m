@@ -54,21 +54,24 @@ classdef half_montage_channel < epworks.p.parse_object
                     case 'Readonly'    
                         obj.read_only = value;
                     otherwise
-                        keyboard
+                        safe_name = epworks.utils.getSafeVariableName(cur_name);
+                        obj.unhandled_props.(safe_name) = value;
                 end
             end
+
+            r.logUnhandledProps(obj);
             
         end
     end
 end
 
-function h__getID(bytes,name)
-    I = strfind(bytes,uint8(name));
-    out = bytes()
-end
-function h__getBytes(name,n_bytes)
-
-end
+% function h__getID(bytes,name)
+%     I = strfind(bytes,uint8(name));
+%     out = bytes()
+% end
+% function h__getBytes(name,n_bytes)
+% 
+% end
 
 % -1 : no data?
 %       - seen for age and birthdate for a file, which was accurate

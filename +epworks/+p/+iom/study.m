@@ -72,8 +72,8 @@ classdef study < epworks.p.parse_object
                                 matlab_timezone = 'America/New_York';
                             case 'Central Standard Time'
                                 matlab_timezone = 'America/Chicago';
-                            % add more mappings as needed
                             otherwise
+                                % add more mappings as needed
                                 error('Unknown or unsupported time zone name.');
                         end
 
@@ -92,9 +92,12 @@ classdef study < epworks.p.parse_object
                     case 'Type'
                         obj.type = value;
                     otherwise
-                        keyboard
+                        safe_name = epworks.utils.getSafeVariableName(cur_name);
+                        obj.unhandled_props.(safe_name) = value;
                 end
             end
+
+            r.logUnhandledProps(obj);
         end
         function childrenToProps(obj,logger)
             class_names = cellfun(@epworks.utils.getShortClassName,obj.children,'un',0);

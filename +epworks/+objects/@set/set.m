@@ -65,6 +65,20 @@ classdef set < epworks.objects.result_object
         num_rejected
     end
 
+    properties (Dependent)
+        t0
+    end
+
+    methods
+        function value = get.t0(obj)
+            tw = obj.triggered_waveforms;
+            value = NaT;
+            if ~isempty(tw)
+                value = tw(1).t0;
+            end
+        end
+    end
+
     methods
         function obj = set(p_main,p,logger)
             %
@@ -82,7 +96,6 @@ classdef set < epworks.objects.result_object
 
             if p.n_children > 0
                 error('Unhandled case')
-                keyboard
             end
 
             d = p.data;
@@ -116,9 +129,27 @@ classdef set < epworks.objects.result_object
                 options.filter = false; %NYI
                 options.add_chan_label = true;
                 options.reverse_y = true;
+                options.spacing = 'file'; %TODO: document
+                options.clear_axes = true;
+
+                %Options
+                %--------
+                %- 'auto'
+                %- 'file' (NYI)
+                %- 'auto_reuse'
+
+                options.color = 'auto_reuse'
             end
 
             %TODO: Validate that this is from one group/trace
+
+            if options.clear_axes
+                ax = gca;
+                cla(ax)
+            end
+
+            %For color reuse
+            color_struct = struct;
 
             options_original = options;
             %TODO: Add on options for TW here
@@ -126,22 +157,59 @@ classdef set < epworks.objects.result_object
                 obj = objs(i);
                 tw = obj.triggered_waveforms;
                 if ~isempty(tw)
+                    tw_datetime = tw(1).t0;
                     options = options_original;
+                    options.clear_axes = false;
                     if i ~= length(objs)
                         options.add_chan_label = false;
                     end
+
+                    if strcmpi(options_original.color,'auto')
+                        %do nothing
+                        options.color = [];
+                    elseif strcmpi(options_original.color,'file')
+                        %do nothing
+                    elseif strcmpi(options_original.color,'auto_reuse')
+                        if i == 1
+                            options.color = [];
+                        else
+                            %tw_names = {tw.name};
+                            fn = fieldnames(s.h_plot);
+                            for j = 1:length(fn)
+                                cur_name = fn{j};
+                                color_struct.(cur_name) = s.h_plot.(cur_name).Color;
+                            end
+                            options.color = color_struct;
+                        end
+                    else
+                        error('Unrecognized color option')
+                    end
+
                     options_cell = epworks.sl.in.structToPropValuePairs(options);
-                    plot(tw,options_cell{:});
+
+                    s = plot(tw,options_cell{:});
+                else
+                    tw_datetime = NaT;
                 end
                 if isscalar(objs)
-                    title(sprintf('Set # %d',obj.set_number));
+                    title(sprintf('Set # %d: %s',obj.set_number,tw_datetime));
                 end
             end
 
             if length(objs) > 1
                 set_numbers = [objs.set_number];
-                sprintf('Sets: %s',mat2str(set_numbers));
+                title(sprintf('Sets: %s',mat2str(set_numbers)))
             end
+        end
+        function objs2 = getBySetNumbers(objs,set_numbers)
+
+            set_numbers2 = [objs.set_number];
+            [mask,loc] = ismember(set_numbers,set_numbers2);
+            if ~all(mask)
+                error('Unable to find match for all requested set numbers')
+            end
+            objs2 = objs(loc);
+
         end
     end
 end
