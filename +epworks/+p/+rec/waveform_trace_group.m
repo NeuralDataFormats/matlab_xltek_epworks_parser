@@ -19,6 +19,10 @@ classdef waveform_trace_group < handle
 
             obj.trace_id = w(1).trace_id;
             obj.waveforms = w;
+            
+            %Note, the merging is done here. Previously it was done in the
+            %REC file but the concern was that multiple REC files should be
+            %joined together.
             obj.merged_waveforms = w.getMerged();
 
             file_ids = [w.file_id];

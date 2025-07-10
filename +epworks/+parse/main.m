@@ -47,7 +47,7 @@ classdef main < handle
         all_waveforms
         waveform_ids
         
-        %These two are aligned
+        %These two are aligned.
         unique_trace_ids_from_waveforms
         waveform_trace_groups
 
@@ -90,6 +90,11 @@ classdef main < handle
             %
             %   This seems to be a copy of the settings but for each
             %   specific history folder.
+            %
+            %   Eventually it would be good to compare these to the IOM. It
+            %   is possible that it would be better to use this instead.
+            %
+
             tst_paths = obj.file_manager.tst_file_paths;
             n_tst = length(tst_paths);
             tst_data = cell(1,n_tst);
@@ -97,7 +102,6 @@ classdef main < handle
                 tst_data{i} = epworks.parse.tst_parser(tst_paths{i});
             end
             obj.tst_data = [tst_data{:}];
-
 
 
             %SPT files
@@ -135,6 +139,7 @@ classdef main < handle
             obj.all_waveforms = [obj.rec_files.waveforms];
             obj.waveform_ids = vertcat(obj.all_waveforms.id);
 
+            %Grouping of waveforms by trace
             %--------------------------------------------------------
             all_trace_ids = vertcat(obj.all_waveforms.trace_id);
             [unique_trace_ids,ia,ic] = unique(all_trace_ids,"rows");
@@ -142,6 +147,8 @@ classdef main < handle
             %This is the null ID we added for missing traces
             if all(unique_trace_ids(1,:) == 0)
                 start_I = 2;
+                obj.unique_trace_ids_from_waveforms = ...
+                    obj.unique_trace_ids_from_waveforms(2,:);
             else
                 start_I = 1;
             end
@@ -149,14 +156,14 @@ classdef main < handle
             trace_groups = cell(1,n_unique);
             for i = start_I:n_unique
                 w_for_trace = obj.all_waveforms(ic == i);
+                %This merges the waveforms
                 trace_groups{i} = epworks.p.rec.waveform_trace_group(w_for_trace);
             end
 
             obj.waveform_trace_groups = [trace_groups{:}];
 
-            %obj.all_merged_waveforms = [obj.rec_files.merged_waveforms];
-            %obj.merged_waveform_ids = vertcat(obj.all_merged_waveforms.first_id);
-
+            %Log orphaned rec files prop
+            %------------------------------------------------------------
             if obj.orphaned_rec_files
                 obj.orphaned_indices = find([obj.rec_files.is_trace_orphan]);
             end
@@ -165,13 +172,11 @@ classdef main < handle
             time = ([obj.rec_files.file_timestamp])';
             n_rec = length(obj.rec_files);
             n_entries = zeros(n_rec,1);
-            n_merged = zeros(n_rec,1);
             for i = 1:n_rec
                 n_entries(i) = length(obj.rec_files(i).waveforms);
-                n_merged(i) = length(obj.rec_files(i).merged_waveforms);
             end
 
-            obj.rec_file_info = table(name,time,n_entries,n_merged);
+            obj.rec_file_info = table(name,time,n_entries);
 
             %Notes parsing
             %----------------------------------------------------------

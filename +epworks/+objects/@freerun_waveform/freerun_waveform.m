@@ -28,7 +28,7 @@ classdef freerun_waveform < epworks.objects.result_object
 
         o_chan
         i_chan
-        n_snippets
+        n_snippets = 0
     end
 
     methods
@@ -98,12 +98,19 @@ classdef freerun_waveform < epworks.objects.result_object
                 end
             end
         end
-        function data = debugWaveformStruct(obj)
+        function s = debugWaveformStruct(obj)
+            %
+            %   This is a temporary function for debugging
+            %
+            %   Work in Progress
+
+            %
+            s = struct;
             w = [];
             for i = 1:length(obj)
                 w = [w obj(i).data.p.waveforms];
             end
-            data = vertcat(w.first_600);
+            s.data = vertcat(w.first_888);
         end
     end
 end

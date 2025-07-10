@@ -104,6 +104,8 @@ classdef main < epworks.RNEL.handle_light
         tests epworks.objects.test
         studies epworks.objects.study
 
+        note1 = 'following waveforms are organized alphabetically'
+        note2 = 'go in through the "groups" objects to get better layout support'
         eeg_waveforms epworks.objects.eeg_waveform
         %
 
@@ -179,11 +181,13 @@ classdef main < epworks.RNEL.handle_light
             %EEG Waveform creation
             %--------------------------------------------------------------
             p_obj = obj.s.eeg_waveform;
-            temp_objs = cell(1,length(p_obj));
-            for i = 1:length(p_obj)
-                temp_objs{i} = epworks.objects.eeg_waveform(obj.p,p_obj(i),logger);
+            if ~isempty(p_obj)
+                temp_objs = cell(1,length(p_obj));
+                for i = 1:length(p_obj)
+                    temp_objs{i} = epworks.objects.eeg_waveform(obj.p,p_obj(i),logger);
+                end
+                obj.eeg_waveforms = [temp_objs{:}];
             end
-            obj.eeg_waveforms = [temp_objs{:}];
 
             %Group creation
             %--------------------------------------------------------------
@@ -198,16 +202,18 @@ classdef main < epworks.RNEL.handle_light
             %Set creation
             %--------------------------------------------------------------
             p_obj = obj.s.set;
-            n_sets = length(p_obj);
-            temp_objs = cell(1,n_sets);
-            for i = 1:n_sets
-                temp_objs{i} = epworks.objects.set(obj.p,p_obj(i),logger);
+            if ~isempty(p_obj)
+                n_sets = length(p_obj);
+                temp_objs = cell(1,n_sets);
+                for i = 1:n_sets
+                    temp_objs{i} = epworks.objects.set(obj.p,p_obj(i),logger);
+                end
+                obj.sets = [temp_objs{:}];
+    
+                set_numbers = [obj.sets.set_number];
+                [~,I] = sort(set_numbers);
+                obj.sets = obj.sets(I);
             end
-            obj.sets = [temp_objs{:}];
-
-            set_numbers = [obj.sets.set_number];
-            [~,I] = sort(set_numbers);
-            obj.sets = obj.sets(I);
 
             %Test creation
             %--------------------------------------------------------------
@@ -230,25 +236,24 @@ classdef main < epworks.RNEL.handle_light
             %Triggered Waveform creation
             %--------------------------------------------------------------
             p_obj = obj.s.triggered_waveform;
-            temp_objs = cell(1,length(p_obj));
-            for i = 1:length(p_obj)
-                temp_objs{i} = epworks.objects.triggered_waveform(obj.p,p_obj(i),logger);
+            if ~isempty(p_obj)
+                temp_objs = cell(1,length(p_obj));
+                for i = 1:length(p_obj)
+                    temp_objs{i} = epworks.objects.triggered_waveform(obj.p,p_obj(i),logger);
+                end
+                obj.triggered_waveforms_unsorted = [temp_objs{:}];
             end
-            obj.triggered_waveforms_unsorted = [temp_objs{:}];
 
             %Freerun Waveform creation
             %--------------------------------------------------------------
             p_obj = obj.s.freerun_waveform;
-            temp_objs = cell(1,length(p_obj));
-            for i = 1:length(p_obj)
-                temp_objs{i} = epworks.objects.freerun_waveform(obj.p,p_obj(i),logger);
+            if ~isempty(p_obj)
+                temp_objs = cell(1,length(p_obj));
+                for i = 1:length(p_obj)
+                    temp_objs{i} = epworks.objects.freerun_waveform(obj.p,p_obj(i),logger);
+                end
+                obj.freerun_waveforms = [temp_objs{:}];
             end
-            obj.freerun_waveforms = [temp_objs{:}];
-
-            %No match with the waveform IDs
-            % free_ids = vertcat(obj.freerun_waveforms.id);
-            % [mask3,loc3] = ismember(free_ids,obj.p.merged_waveform_ids,'rows');
-            % [mask4,loc4] = ismember(free_ids,obj.p.waveform_ids,'rows');
 
             %--------------------------------------------------------------
             %--------------------------------------------------------------

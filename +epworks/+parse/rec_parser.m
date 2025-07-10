@@ -15,7 +15,6 @@ classdef rec_parser < handle
     %   epworks.p.rec.waveform
     %   
 
-    
     properties
         bytes
     end
@@ -49,8 +48,6 @@ classdef rec_parser < handle
         
         waveforms %[1 x n], epworks.history.rec_waveform
         
-        merged_waveforms
-
         trace
         ochan
         fs = NaN
