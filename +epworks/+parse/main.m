@@ -47,6 +47,7 @@ classdef main < handle
         all_waveforms
         waveform_ids
         
+        null_id_present = false
         %These two are aligned.
         %
         %   This first one comes from the REC files
@@ -73,11 +74,15 @@ classdef main < handle
     end
 
     methods
-        function obj = main(study_path_or_iom_path)
+        function obj = main(study_path_or_iom_path,show_rec_progress)
             %
             %   Inputs
             %   ------
             %   
+            %
+            %   See Also
+            %   --------
+            %   epworks.main
 
             %A study consists of multiple files. The file manager
             %takes care of knowing where those files are
@@ -128,6 +133,9 @@ classdef main < handle
             
             tz_offset = obj.iom.s2.study(1).data.tz_offset;
             for iRec = 1:n_rec_files
+                if show_rec_progress
+                    fprintf('%d/%d\n',iRec,n_rec_files);
+                end
                 temp = epworks.parse.rec_parser(...
                     all_rec_files{iRec},obj.iom.logger,tz_offset,iRec,...
                     obj.iom.bytes);
@@ -152,10 +160,12 @@ classdef main < handle
             %   If true, remove the first row
             if all(unique_trace_ids(1,:) == 0)
                 start_I = 2;
+                obj.null_id_present = true;
                 obj.unique_trace_ids_from_waveforms = ...
                     obj.unique_trace_ids_from_waveforms(2:end,:);
             else
                 start_I = 1;
+                obj.null_id_present = false;
             end
             n_unique = length(ia);
             trace_groups = cell(1,n_unique);

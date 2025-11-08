@@ -132,13 +132,15 @@ classdef main < epworks.RNEL.handle_light
             arguments
                 study_path_or_iom_path
                 options.sort_by_display = true;
+                options.show_rec_progress = false;
             end
             
             if nargin == 0
                 study_path_or_iom_path = '';
             end
 
-            obj.p = epworks.parse.main(study_path_or_iom_path);
+            obj.p = epworks.parse.main(study_path_or_iom_path,...
+                options.show_rec_progress);
             obj.s = obj.p.iom.s2;
             
             %I don't like where this object lives but I think

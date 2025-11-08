@@ -12,6 +12,11 @@ classdef notes < handle
 
     properties
         data
+        %   .created
+        %   .title
+        %   .comment (auxillary, often seen with impedance checks)
+        %   .category
+        %   .type
     end
 
     methods
@@ -43,6 +48,15 @@ classdef notes < handle
 
             obj.data = table(created,title,comment,category,type);
 
+        end
+        function plot(obj)
+            %
+            %   TODO: expose some common options
+            %   - line color?
+            %   - anything else
+            
+            [line_handles,s] = sl.plot.type.verticalLines(obj.data.created,...
+                'strings',obj.data.title);
         end
     end
 end

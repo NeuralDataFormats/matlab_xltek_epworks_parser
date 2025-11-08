@@ -108,7 +108,10 @@ classdef eeg_waveform < epworks.objects.result_object
             %
             %   Outputs
             %   -------
-            %       s
+            %       s : struct
+            %           .raw_data
+            %           .data
+            %           .time
             %
             %   This does:
             %   1. computes time array (if desired)
@@ -129,6 +132,13 @@ classdef eeg_waveform < epworks.objects.result_object
                 index (1,1) {mustBeNumeric}
                 in.filter (1,1) {mustBeNumericOrLogical} = false
                 in.time_format {mustBeMember(in.time_format,{'datetime','numeric','none'})} = 'datetime';
+
+                %JAH: 11/8/2025 modified
+                in.notch_cutoff = 60;
+                in.lff_cutoff = obj.lff_cutoff;
+                in.hff_cutoff = obj.hff_cutoff;
+
+                %These are guesses
                 in.notch_width (1,1) {mustBeNumeric} = 20
                 in.notch_order (1,1) {mustBeNumeric} = 8
                 %I grabbed these from the defaults settings ...
@@ -149,22 +159,32 @@ classdef eeg_waveform < epworks.objects.result_object
             if in.filter
                 d2 = d;
                 half_fs = obj.data.fs/2;
-                if obj.lff_cutoff > 0
+                if in.lff_cutoff > 0
                     [B,A] = butter(1,obj.lff_cutoff/half_fs,"high");
-                    d2 = filter(B,A,d2);
+                    d2 = filtfilt(B,A,d2);
                 end
-                if obj.hff_cutoff > 0
+                if in.hff_cutoff > 0
                     [B,A] = butter(1,obj.hff_cutoff/half_fs,"low");
-                    d2 = filter(B,A,d2);
+                    d2 = filtfilt(B,A,d2);
                 end
-                if obj.notch_cutoff > 0
+                if in.notch_cutoff > 0
                     hw = 0.5*in.notch_width;
-                    f1 = obj.notch_cutoff-hw;
-                    f2 = obj.notch_cutoff+hw;
+                    f1 = in.notch_cutoff-hw;
+                    f2 = in.notch_cutoff+hw;
 
                     wn = [f1 f2]./half_fs;
                     [B,A] = butter(in.notch_order,wn,"stop");
                     d2 = filter(B,A,d2);
+
+                    % f0 = 60;
+                    % Q = 35;
+                    % bw = f0/Q; 
+                    % d = designNotchPeakIIR( ...
+                    %     "FilterType","notch", ...
+                    %     "CenterFrequency",60, ...
+                    %     "Bandwidth",bw, ...
+                    %     "SampleRate",obj.data.fs);
+                    % d2 = filtfilt(d,d2);
                 end
                 d = d2;
             end
