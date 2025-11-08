@@ -48,11 +48,14 @@ classdef main < handle
         waveform_ids
         
         %These two are aligned.
+        %
+        %   This first one comes from the REC files
         unique_trace_ids_from_waveforms
+
+        %TODO: Document this ...
         waveform_trace_groups
 
         orphaned_rec_files = false
-        
         
         orphaned_indices %These are the indices of the .REC files with no 
         % trace object. You can index into .rec_files based on these
@@ -145,10 +148,12 @@ classdef main < handle
             [unique_trace_ids,ia,ic] = unique(all_trace_ids,"rows");
             obj.unique_trace_ids_from_waveforms = unique_trace_ids;
             %This is the null ID we added for missing traces
+            %
+            %   If true, remove the first row
             if all(unique_trace_ids(1,:) == 0)
                 start_I = 2;
                 obj.unique_trace_ids_from_waveforms = ...
-                    obj.unique_trace_ids_from_waveforms(2,:);
+                    obj.unique_trace_ids_from_waveforms(2:end,:);
             else
                 start_I = 1;
             end

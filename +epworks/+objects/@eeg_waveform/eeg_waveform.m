@@ -26,6 +26,11 @@ classdef eeg_waveform < epworks.objects.result_object
         parent
         trace
         note = 'should really use getData() instead of accessing .data'
+
+        %When does this get populated?
+        %   - constructor, loads based on IDs found in REC files
+        %
+        %   
         data epworks.objects.signal
 
         trace_id
@@ -47,6 +52,14 @@ classdef eeg_waveform < epworks.objects.result_object
 
     methods
         function obj = eeg_waveform(p_main,p,logger)
+            %
+            %
+            %   Inputs
+            %   ------
+            %   p_main : epworks.parse.main
+            %   p : epworks.p.iom.eeg_waveform
+            %   logger : epworks.parse.iom.logger
+
             obj = obj@epworks.objects.result_object(p,logger);
             obj.name = p.data.trace_obj.name;
             obj.lff_cutoff = p.data.lff_cutoff;
@@ -55,7 +68,9 @@ classdef eeg_waveform < epworks.objects.result_object
 
             obj.parent = p.parent.id;
             
+            %This gets overridden with the object
             obj.trace = p.data.trace_obj.id;
+
             %This we will not override
             obj.trace_id = obj.trace;
 
