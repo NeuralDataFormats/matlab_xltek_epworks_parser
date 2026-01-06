@@ -29,10 +29,17 @@ classdef stims < epworks.p.parse_object
         is_output
         location
         mask_intensity
+
+        %2 - repetitive trains
+        %0 - repetitive pulses
         mode
+        
         nerve
         number_of_phases
-        on_timeline
+
+        %-1 : default, not set
+        on_timeline = -1
+
         phys_name
         phys_num
         polarity

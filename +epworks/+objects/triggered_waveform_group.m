@@ -43,6 +43,7 @@ classdef triggered_waveform_group < handle
 
             obj.id = trig_objs(1).id;
             obj.trace_id = trig_objs(1).trace.id;
+
             obj.name = trig_objs(1).name;
             obj.group_name = trig_objs(1).set.parent.name;
             obj.trig_objs = trig_objs;

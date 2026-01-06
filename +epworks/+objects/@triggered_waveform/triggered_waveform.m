@@ -6,6 +6,13 @@ classdef triggered_waveform < epworks.objects.result_object
     %   Note this is exposed to the user in the class:
     %   epworks.objects.triggered_waveform_group
     %
+    %   Structure
+    %   ---------
+    %   file
+    %       .triggered_waveforms (triggered_waveform_group)
+    %           .trig_objs (this class)
+    %
+    %
     %   This primarily holds the info for the stimulation.
     %
     %   It also holds the data but I need to fix some redundancy issues
@@ -23,14 +30,18 @@ classdef triggered_waveform < epworks.objects.result_object
     %   -----
     %   1) For each trace, find how many times
     %   it is listed as a triggered waveform
-    %       - does this align with the # of data
-    %       points
+    %       - does this align with the # of data points
     %
     %   I guess what I am asking is whether you can
     %   have something be triggered and also not triggered
     %
-    %   - unique triggered_waveforms
-    %   - 
+    %   Note, in the implementation we don't prevent a waveform from being
+    %   in both. Our search for triggered waveforms is over all waveforms,
+    %   not over the list of waveforms that are not used elsewhere.
+    %
+    %   See epworks.parse.main, note when 'waveform_ids' gets populated
+    %   relative to the grouping of waveforms (which is used for continuous
+    %   data plotting). Below we use 'waveform_ids' to grab our data.
     %
     %
     %
@@ -132,7 +143,11 @@ classdef triggered_waveform < epworks.objects.result_object
             %
             %   Inputs
             %   ------
+            %   p_main : epworks.parse.main
             %
+            %   See Also
+            %   --------
+            %   epworks.objects.triggered_waveform_group
 
             obj = obj@epworks.objects.result_object(p,logger);
             d = p.data;
@@ -154,9 +169,14 @@ classdef triggered_waveform < epworks.objects.result_object
             obj.parent = p.parent.id;
             obj.trace = d.trace_obj.id;
 
+            %Grab data, if available
+            %-----------------------------------------------------------
             [mask,loc] = ismember(obj.id,p_main.waveform_ids,'rows');
 
             if mask
+                %This is a debugging step
+                p_main.used_waveform_ids(loc) = 1;
+
                 w = p_main.all_waveforms(loc);
                 obj.data = w.data;
                 obj.t0 = w.timestamp;

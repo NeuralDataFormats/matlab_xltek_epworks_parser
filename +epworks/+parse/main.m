@@ -45,13 +45,37 @@ classdef main < handle
         rec_files
 
         all_waveforms
+
+        %What are possible "holders" of this:
+        %- epworks.objects.triggered_waveform
+        %- 
         waveform_ids
+
+        %This is a debugging thing
+        used_waveform_ids
+        %0 - not used
+        %1 - triggered waveforms
+
+        %More debugging
+        unique_trace_index_for_each_waveform
         
         null_id_present = false
         %These two are aligned.
         %
         %   This first one comes from the REC files
         unique_trace_ids_from_waveforms
+        
+        %Debugging - when an object is constructed that holds a trace
+        %update this variable - e.g. for eeg_waveforms,triggered_waveforms,
+        %freerun_waveforms
+        used_trace_ids
+
+        %0) not used
+        %1) EEG waveforms
+        %2) freerun waveforms
+        %4) triggered waveforms
+        %
+        %   Note, these are added, 3=1+2, 5=1+4, 6=2+4, 7=1+2+4
 
         %TODO: Document this ...
         waveform_trace_groups
@@ -148,13 +172,27 @@ classdef main < handle
             obj.rec_files = [rec_files_cell{:}]; 
 
             obj.all_waveforms = [obj.rec_files.waveforms];
+
+            %Note, these are used for identifying triggered waveforms
             obj.waveform_ids = vertcat(obj.all_waveforms.id);
+            obj.used_waveform_ids = zeros(1,size(obj.waveform_ids,1));
 
             %Grouping of waveforms by trace
             %--------------------------------------------------------
+            %
+            %   Here we gather all waveforms that belong to a single 
+            %   trace into a group. In particular this is useful for
+            %   continuous waveforms as it allows us to take snippets
+            %   and reconstitute a longer signal.
+            %
+            %   Important Class:
+            %   epworks.p.rec.waveform_trace_group
+            %
             all_trace_ids = vertcat(obj.all_waveforms.trace_id);
             [unique_trace_ids,ia,ic] = unique(all_trace_ids,"rows");
+            obj.unique_trace_index_for_each_waveform = ic;
             obj.unique_trace_ids_from_waveforms = unique_trace_ids;
+            obj.used_trace_ids = zeros(1,size(unique_trace_ids,1));
             %This is the null ID we added for missing traces
             %
             %   If true, remove the first row
@@ -176,6 +214,8 @@ classdef main < handle
             end
 
             obj.waveform_trace_groups = [trace_groups{:}];
+
+            %--------------------------------------------------------------
 
             %Log orphaned rec files prop
             %------------------------------------------------------------
@@ -208,6 +248,9 @@ classdef main < handle
             mask = ismember(obj.unique_trace_ids_from_waveforms,trace_id,'rows');
             wtg = obj.waveform_trace_groups(mask);
 
+        end
+        function s = getWaveformIDUsageStatus(obj)
+            keyboard
         end
     end
 end

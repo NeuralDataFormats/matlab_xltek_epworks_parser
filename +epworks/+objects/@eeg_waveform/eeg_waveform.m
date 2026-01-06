@@ -74,6 +74,15 @@ classdef eeg_waveform < epworks.objects.result_object
             %This we will not override
             obj.trace_id = obj.trace;
 
+            %Some debugging
+            %----------------------------------
+            mask = ismember(p_main.unique_trace_ids_from_waveforms,obj.trace_id,'rows');
+            if any(mask)
+                p_main.used_trace_ids(mask) = p_main.used_trace_ids(mask) + 1;
+            end
+
+            %Data retrieval
+            %-----------------------------------
             wtg = p_main.getWaveformTraceGroupFromTraceID(obj.trace);
             if ~isempty(wtg)
                 obj.data = epworks.objects.signal(wtg,p.data.trace_obj.name);

@@ -9,6 +9,7 @@ classdef signal < handle
     %   See Also
     %   --------
     %   epworks.objects.trace
+    %   epworks.objects.freerun_waveform
 
     properties
         name
@@ -43,6 +44,7 @@ classdef signal < handle
             obj.name = name;
             obj.p = p_trace_waveform_group;
             
+            %Class: 
             mw = obj.p.merged_waveforms;
 
             fs_all = [mw.fs];

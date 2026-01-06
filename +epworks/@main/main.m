@@ -10,7 +10,7 @@ classdef main < epworks.RNEL.handle_light
     %
     %   Hierarchy
     %   ---------
-    %   patient
+    %   patient - NYI
     %     study
     %       test
     %         group
@@ -18,6 +18,11 @@ classdef main < epworks.RNEL.handle_light
     %             eeg_waveform
     %             triggered_waveform
     %             freerun_waveform
+    %
+    %   See Also
+    %   --------
+    %   epworks.objects.triggered_waveform_group
+    %
     %
     %
     %   Settings
@@ -75,12 +80,13 @@ classdef main < epworks.RNEL.handle_light
     %   --------
     %   epworks.parse.main
 
-    properties (Hidden)
+    properties
         s %This is a structure that holds all of the top level parsed
         %objects.
 
         triggered_waveforms_unsorted
         %sets_unsorted
+        note0 = "above are 'Hidden' variables that generally shouldn't be used"
     end
 
     properties
@@ -339,14 +345,30 @@ classdef main < epworks.RNEL.handle_light
             %   .triggered_waveforms_unsorted contains all TW for all sets
             %   and all groups. Often though I think you want to first
             %   narrow in on a specific set or trace. This helps with
-            %   narrowing by trace. Above we narrowed by set.
+            %   narrowing by trace. Above we narrowed by set (i.e.
+            %   accessible in <this>.sets(<index>).triggered_waveforms
 
             if ~isempty(obj.triggered_waveforms_unsorted)
                 tw_trace_ids = vertcat(obj.triggered_waveforms_unsorted.trace_id);
-                [~,ia,ic] = unique(tw_trace_ids,'rows');
+                [unique_tw_trace_ids,ia,ic] = unique(tw_trace_ids,'rows');
+
                 n_unique = length(ia);
                 tw_groups_cell = cell(n_unique,1);
                 for i = 1:length(ia)
+
+                    %Some debugging
+                    %----------------------------------
+                    mask = ismember(obj.p.unique_trace_ids_from_waveforms,unique_tw_trace_ids(i,:),'rows');
+                    if any(mask)
+                        obj.p.used_trace_ids(mask) = obj.p.used_trace_ids(mask) + 4;
+                        %Also set in
+                        %-----------
+                        %epworks.objects.freerun_waveform   
+                        %epworks.objects.eeg_waveform
+                    end
+
+                    %Creation of the group object
+                    %-------------------------------------
                     tw_groups_cell{i} = epworks.objects.triggered_waveform_group(...
                         obj.triggered_waveforms_unsorted(i == ic));
     
