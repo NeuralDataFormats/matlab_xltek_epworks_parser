@@ -250,7 +250,31 @@ classdef main < handle
 
         end
         function s = getWaveformIDUsageStatus(obj)
-            keyboard
+            %waveform_ids - [n x 16]
+            %used_waveform_ids - [1 x n] - whether the waveform was used
+            %       Note, this will miss groupings, so we need to 
+            %       use the following
+            %unique_trace_index_for_each_waveform - [n x 1]
+            %       - value maps from 'waveform_ids' to
+            %       'unique_trace_ids_from_waveforms'
+            %       - For example, if
+            %       unique_trace_index_for_each_waveform(10) is 6, this
+            %       indicates that the 10th waveform id is the same as the
+            %       6th unique trace id
+            %used_trace_ids - [1 x n_unique] - a value of non-1 indicates
+            %       the variable is used
+            %unique_trace_ids_from_waveforms - [n_unique x 16]
+            %       unique IDs (unique rows of 'waveform_ids')
+
+            %To get which waveform IDs are used we want to create a
+            %temporary variable of used_waveform_ids. We then want to
+            %go through 
+
+            % n_waveforms = size(obj.waveform_ids,1);
+            % used2 = zeros(1,n_waveforms);
+            s = struct;
+            s.waveform_usage_status = obj.used_trace_ids(obj.unique_trace_index_for_each_waveform);
+            s.unused_waveform_indices = find(s.waveform_usage_status == 0);
         end
     end
 end
